@@ -33,4 +33,4 @@ For licensing inquiries or permission requests:
 
 ---
 
-*This repository is for demonstration and reference purposes only. No usage rights are granted.*
+*Usage rights are not granted until appropriate safety and security measures are in place.*
