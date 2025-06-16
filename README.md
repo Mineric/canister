@@ -1,4 +1,5 @@
-# Canister - code agent - potential self improvement
+# Canister 
+- code agent - rescursively self improve (potentially)
 
 ## Overview
 
