@@ -1,10 +1,9 @@
 # Canister 
-- A canister is a containerized environment where code agents reside, designed for recursive self-improvement and experimentation.
+Canister is a containerized environment where agents reside, designed for recursive self-improvement and experimentation.
 
 ## Overview
-
-Canister is a coding agent with the design, which aimed to self improved. 
-It features advanced AST-based code merging capabilities and comprehensive codebase indexing for intelligent code analysis and manipulation.
+Canister agent is a coding agent engineered for self-improvement within a canister which is safe and controlled environment.
+It features AST-based code merging and comprehensive codebase indexing, intelligent analysis, transformation, and manipulation of source code.
 
 ## Key Features
 
