@@ -14,13 +14,6 @@ It features AST-based code merging and comprehensive codebase indexing, intellig
 - **File Operations**: Advanced file system operations and terminal command execution
 - **Docker Integration**: Sandboxed code execution in Docker containers
 
-## Architecture
-
-- **Google ADK Integration**: Built on Google's Agent Development Kit
-- **LiteLLM Support**: Compatible with OpenAI and other LLM providers
-- **SQLite Storage**: Efficient codebase indexing with persistent storage
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-
 ## License
 
 **⚠️ PROPRIETARY SOFTWARE - ALL RIGHTS RESERVED**
