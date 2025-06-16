@@ -27,23 +27,3 @@
    - Monitor for any anomalies or required refinements post-deployment.
 
 By following this structured approach, I'll ensure modifications are precise, reliable, and aligned with best practices, minimizing issues and maximizing productivity.
-
-
-curl -X POST http://localhost:8000/apps/agent/users/u_123/sessions/s_123 \
-  -H "Content-Type: application/json" \
-  -d '{"state": {"key1": "value1", "key2": 42}}'
-
-
-curl -X POST http://localhost:8000/run \
--H "Content-Type: application/json" \
--d '{
-"appName": "agent",
-"userId": "u_123",
-"sessionId": "s_123",
-"newMessage": {
-    "role": "user",
-    "parts": [{
-    "text": "could you try again?"
-    }]
-}
-}'

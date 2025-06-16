@@ -5,7 +5,6 @@ from pathlib import Path
 from google.adk.tools import FunctionTool
 import requests
 import logging
-from google.adk.tools import google_search
 
 def get_current_time_tool() -> FunctionTool:
     """Create a tool that gets the current date and time."""

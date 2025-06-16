@@ -1,5 +1,10 @@
-# Canister 
-Canister is a containerized environment where agents reside, designed for recursive self-improvement and experimentation.
+# Canister
+
+<div align="left">
+  <img src="canister.png" alt="Canister Logo" width="75" height="115">
+</div>
+
+Canister is a containerized environment where an agent reside, designed for recursive self-improvement and experimentation.
 
 ## Overview
 Canister agent is a coding agent engineered for self-improvement within a canister which is safe and controlled environment.

@@ -1,9 +1,9 @@
 import unittest
 from unittest.mock import patch
-from web_search import WebSearch
+from agent.tools.tools import WebSearch
 
 class TestWebSearchIntegration(unittest.TestCase):
-    @patch('web_search.requests.get')
+    @patch('agent.tools.tools.requests.get')
     def test_web_search(self, mock_get):
         """Test the web search integration with mock data."""
         # Define mock response data
