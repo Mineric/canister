@@ -8,6 +8,10 @@ or distribution rights are granted without explicit written permission.
 
 from google.adk.agents import LlmAgent
 from google.adk.models.lite_llm import LiteLlm
+from google.adk.sessions import InMemorySessionService, VertexAiSessionService
+from google.adk.memory import InMemoryMemoryService, VertexAiRagMemoryService
+from google.adk.runners import Runner
+from google.adk.tools import load_memory
 from .tools.tools import (
     get_current_time_tool,
     calculator_tool,
@@ -33,6 +37,11 @@ from .tools.codebase_indexer import (
     code_search_tool,
     file_analysis_tool,
     self_awareness_tool
+)
+from .tools.memory_engine import (
+    memory_search_tool,
+    context_tool,
+    memory_management_tool
 )
 
 
@@ -64,6 +73,11 @@ def create_agent():
         code_search_tool(),
         file_analysis_tool(),
         self_awareness_tool(),
+
+        # Memory and context tools
+        memory_search_tool(),
+        context_tool(),
+        memory_management_tool(),
     ]
 
     agent = LlmAgent(
