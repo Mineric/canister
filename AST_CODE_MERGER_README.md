@@ -2,7 +2,7 @@
 
 ## Overview
 
-The AST-Based Code Merger Tool is an intelligent code integration system designed for the Google ADK agent framework. It uses Python's Abstract Syntax Tree (AST) module to surgically merge LLM-generated code snippets into existing Python source files while preserving structure, avoiding duplicates, and maintaining code quality.
+The AST-Based Code Merger Tool is an intelligent code integration system designed for the canisterized code agent. It uses Python's Abstract Syntax Tree (AST) module to surgically merge LLM-generated code snippets into existing Python source files while preserving structure, avoiding duplicates, and maintaining code quality.
 
 ## Key Features
 
