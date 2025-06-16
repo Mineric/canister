@@ -1,8 +1,9 @@
-# Cannister - Advanced AI Coding Assistant
+# Canister 
+Canister is a containerized environment where agents reside, designed for recursive self-improvement and experimentation.
 
 ## Overview
-
-Cannister is a sophisticated AI-powered coding assistant built on the Google ADK framework. It features advanced AST-based code merging capabilities and comprehensive codebase indexing for intelligent code analysis and manipulation.
+Canister agent is a coding agent engineered for self-improvement within a canister which is safe and controlled environment.
+It features AST-based code merging and comprehensive codebase indexing, intelligent analysis, transformation, and manipulation of source code.
 
 ## Key Features
 
@@ -13,26 +14,17 @@ Cannister is a sophisticated AI-powered coding assistant built on the Google ADK
 - **File Operations**: Advanced file system operations and terminal command execution
 - **Docker Integration**: Sandboxed code execution in Docker containers
 
-## Architecture
-
-- **Google ADK Integration**: Built on Google's Agent Development Kit
-- **LiteLLM Support**: Compatible with OpenAI and other LLM providers
-- **SQLite Storage**: Efficient codebase indexing with persistent storage
-- **Cross-Platform**: Works on Windows, macOS, and Linux
-
 ## License
 
-**⚠️ PROPRIETARY SOFTWARE - ALL RIGHTS RESERVED**
-
-This software is proprietary and confidential. No usage, modification, or distribution rights are granted to any party other than the copyright holder. See [LICENSE](LICENSE) for full terms.
+See [LICENSE](LICENSE) for full terms.
 
 Copyright © 2024 Thant Min Htet. All rights reserved.
 
 ## Contact
 
 For licensing inquiries or permission requests:
-- **Author**: Thant Min Htet
-- **Email**: thantminhtet18@gmail.com
+- **Author**: Min Htet, Thant
+- **Email**: thant.mht@gmail.com
 
 ---
 
