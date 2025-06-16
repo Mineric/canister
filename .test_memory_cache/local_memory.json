@@ -1,0 +1,135 @@
+{
+  "decision_session_2_1750095529.86981": {
+    "id": "decision_session_2_1750095529.86981",
+    "content": "Fixed bug in user validation",
+    "context_type": "decision",
+    "timestamp": "2025-06-17T02:38:49.869820",
+    "session_id": "session_2",
+    "user_id": "user_0",
+    "metadata": {
+      "bug_id": "123"
+    },
+    "priority": {
+      "relevance_score": 0.145,
+      "recency_score": 1.0,
+      "importance_score": 0.95,
+      "token_cost": 6
+    },
+    "access_count": 2,
+    "last_accessed": "2025-06-17T02:38:49.874421"
+  },
+  "error_session_0_1750095529.869998": {
+    "id": "error_session_0_1750095529.869998",
+    "content": "Database connection error",
+    "context_type": "error",
+    "timestamp": "2025-06-17T02:38:49.870004",
+    "session_id": "session_0",
+    "user_id": "user_1",
+    "metadata": {
+      "severity": "medium"
+    },
+    "priority": {
+      "relevance_score": 0.1,
+      "recency_score": 1.0,
+      "importance_score": 0.85,
+      "token_cost": 3
+    },
+    "access_count": 0,
+    "last_accessed": null
+  },
+  "decision_session_0_1750095529.870534": {
+    "id": "decision_session_0_1750095529.870534",
+    "content": "Added rate limiting",
+    "context_type": "decision",
+    "timestamp": "2025-06-17T02:38:49.870538",
+    "session_id": "session_0",
+    "user_id": "user_0",
+    "metadata": {
+      "feature": "security"
+    },
+    "priority": {
+      "relevance_score": 0.1,
+      "recency_score": 1.0,
+      "importance_score": 0.95,
+      "token_cost": 3
+    },
+    "access_count": 0,
+    "last_accessed": null
+  },
+  "error_session_1_1750095529.870883": {
+    "id": "error_session_1_1750095529.870883",
+    "content": "Memory leak in session handler",
+    "context_type": "error",
+    "timestamp": "2025-06-17T02:38:49.870892",
+    "session_id": "session_1",
+    "user_id": "user_1",
+    "metadata": {
+      "severity": "high"
+    },
+    "priority": {
+      "relevance_score": 0.1,
+      "recency_score": 1.0,
+      "importance_score": 0.85,
+      "token_cost": 6
+    },
+    "access_count": 0,
+    "last_accessed": null
+  },
+  "analysis_session_2_1750095529.871148": {
+    "id": "analysis_session_2_1750095529.871148",
+    "content": "Optimized database queries",
+    "context_type": "analysis",
+    "timestamp": "2025-06-17T02:38:49.871158",
+    "session_id": "session_2",
+    "user_id": "user_0",
+    "metadata": {
+      "performance": "improved"
+    },
+    "priority": {
+      "relevance_score": 0.12000000000000001,
+      "recency_score": 1.0,
+      "importance_score": 0.8,
+      "token_cost": 3
+    },
+    "access_count": 2,
+    "last_accessed": "2025-06-17T02:38:49.874430"
+  },
+  "decision_session_1_1750095529.871722": {
+    "id": "decision_session_1_1750095529.871722",
+    "content": "Implemented caching layer",
+    "context_type": "decision",
+    "timestamp": "2025-06-17T02:38:49.871726",
+    "session_id": "session_1",
+    "user_id": "user_0",
+    "metadata": {
+      "cache": "redis"
+    },
+    "priority": {
+      "relevance_score": 0.1,
+      "recency_score": 1.0,
+      "importance_score": 0.95,
+      "token_cost": 3
+    },
+    "access_count": 0,
+    "last_accessed": null
+  },
+  "error_session_2_1750095529.87204": {
+    "id": "error_session_2_1750095529.87204",
+    "content": "SSL certificate expired",
+    "context_type": "error",
+    "timestamp": "2025-06-17T02:38:49.872044",
+    "session_id": "session_2",
+    "user_id": "user_1",
+    "metadata": {
+      "severity": "critical"
+    },
+    "priority": {
+      "relevance_score": 0.1,
+      "recency_score": 1.0,
+      "importance_score": 0.85,
+      "token_cost": 3
+    },
+    "access_count": 0,
+    "last_accessed": null
+  }
+}
