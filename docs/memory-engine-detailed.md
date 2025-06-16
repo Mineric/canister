@@ -1,6 +1,6 @@
 # Memory & Context Engine
 
-A robust memory and context management system for the Canister agent, integrating Google ADK memory capabilities with codebase awareness for professional-level context retention and retrieval.
+A robust memory and context management system for the Canister agent, integrating ADK memory capabilities with codebase awareness for context retention and retrieval.
 
 ## 🎯 **Overview**
 

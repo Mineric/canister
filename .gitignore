@@ -20,3 +20,7 @@ agent/.env
 
 # Codebase indexer cache
 .codebase_cache/
+
+# Memory cache directories
+.memory_cache/
+*/.memory_cache/

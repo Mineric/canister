@@ -14,7 +14,7 @@ It features AST-based code merging and comprehensive codebase indexing, intellig
 
 - **AST-Based Code Merging**: Intelligently merge LLM-generated code snippets into existing Python files
 - **Codebase Indexing**: Deep understanding and navigation of codebases with searchable knowledge bases
-- **Self-Awareness**: Agent can analyze its own capabilities and structure
+- **Self-Code-Awareness**: Agent can analyze its own capabilities and structure
 - **Code Analysis**: Comprehensive code structure analysis and dependency mapping
 - **File Operations**: Advanced file system operations and terminal command execution
 - **Docker Integration**: Sandboxed code execution in Docker containers
