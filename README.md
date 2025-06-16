@@ -1,5 +1,5 @@
 # Canister 
-- code agent - rescursively self improve (potentially)
+- code agent - rescursively self improve (experimentation)
 
 ## Overview
 
