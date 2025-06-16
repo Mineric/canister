@@ -13,5 +13,10 @@ wheels/
 # Environment files
 *.env
 .env
+.env.*
 */.env
 **/.env
+agent/.env
+
+# Codebase indexer cache
+.codebase_cache/
