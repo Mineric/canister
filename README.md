@@ -1,7 +1,7 @@
 # Canister
 
 <div align="left">
-  <img src="canister.png" alt="Canister Logo" width="60" height="90">
+  <img src="canister-logo.png" alt="Canister Logo" width="60" height="90">
 </div>
 
 Canister is a containerized environment where an agent reside, designed for recursive self-improvement experimentations.
