@@ -16,9 +16,7 @@ It features AST-based code merging and comprehensive codebase indexing, intellig
 
 ## License
 
-**⚠️ PROPRIETARY SOFTWARE - ALL RIGHTS RESERVED**
-
-This software is proprietary and confidential. No usage, modification, or distribution rights are granted to any party other than the copyright holder. See [LICENSE](LICENSE) for full terms.
+See [LICENSE](LICENSE) for full terms.
 
 Copyright © 2024 Thant Min Htet. All rights reserved.
 
