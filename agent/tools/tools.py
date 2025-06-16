@@ -3,8 +3,6 @@ import os
 import subprocess
 from pathlib import Path
 from google.adk.tools import FunctionTool
-import requests
-import logging
 
 def get_current_time_tool() -> FunctionTool:
     """Create a tool that gets the current date and time."""
@@ -270,69 +268,6 @@ def terminal_command_tool() -> FunctionTool:
 
     return FunctionTool(terminal_command)
 
-def code_analysis_tool() -> FunctionTool:
-    """Create a tool for analyzing Python code files."""
-
-    def analyze_code(file_path: str) -> str:
-        """
-        Analyze a Python file and return a summary of its contents, including functions, classes, and docstrings.
-        
-        Args:
-            file_path: The path to the Python file to be analyzed.
-        
-        Returns:
-            A summary string of the Python file's structure.
-        """
-        from ast import parse, get_docstring, walk, FunctionDef, ClassDef
-        from pathlib import Path
-
-        # Read the file
-        try:
-            code_path = Path(file_path)
-            if not code_path.is_file():
-                return f"Error: '{file_path}' is not a valid file."
-            
-            with open(code_path, 'r', encoding='utf-8') as f:
-                code_content = f.read()
-
-            tree = parse(code_content)
-            summary = []
-            
-            for node in walk(tree):
-                if isinstance(node, (FunctionDef, ClassDef)):
-                    name = node.name
-                    type_name = "Class" if isinstance(node, ClassDef) else "Function"
-                    docstring = get_docstring(node) or "No docstring provided."
-                    summary.append(f"{type_name} '{name}': {docstring}")
-
-            return "\n\n".join(summary) if summary else "No functions or classes found in the file."
-
-        except Exception as e:
-            return f"Error analyzing file '{file_path}': {str(e)}"
-
-    return FunctionTool(analyze_code)
-
-class WebSearch:
-    def __init__(self, api_key, search_engine_id=None):
-        self.api_key = api_key
-        self.search_engine_id = search_engine_id
-        self.service_url = "https://www.googleapis.com/customsearch/v1"
-
-    def search(self, query):
-        """Performs a web search using Google Custom Search API."""
-        try:
-            parameters = {
-                "q": query,
-                "key": self.api_key,
-                "cx": self.search_engine_id
-            }
-            response = requests.get(self.service_url, params=parameters)
-            response.raise_for_status()
-            return response.json().get("items", [])
-        except requests.exceptions.HTTPError as err:
-            logging.error(f"HTTP error occurred: {err}")
-        except Exception as e:
-            logging.error(f"An error occurred: {e}")
 
 
 def docker_sandbox_tool() -> FunctionTool:
