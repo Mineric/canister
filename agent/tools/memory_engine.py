@@ -1,6 +1,6 @@
 """
 Memory & Context Engine - Canister Agent
-Copyright (c) 2024 Thant Min Htet. All rights reserved.
+Copyright (c) 2025 Thant Min Htet. All rights reserved.
 
 Memory system integrating Google ADK memory capabilities
 with codebase indexer for context awareness.

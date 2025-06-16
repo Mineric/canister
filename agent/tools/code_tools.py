@@ -1,14 +1,3 @@
-"""
-AST-Based Code Merger Tool - Cannister
-Copyright (c) 2024 Thant Min Htet. All rights reserved.
-
-Advanced AST-based code merger that intelligently integrates LLM-generated code
-snippets into existing Python source files while preserving structure and avoiding duplicates.
-
-This software is proprietary and confidential. No usage, modification,
-or distribution rights are granted without explicit written permission.
-"""
-
 import ast
 import astor
 from pathlib import Path

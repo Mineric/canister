@@ -1,14 +1,3 @@
-"""
-Advanced Code Comprehension Engine - Canister Agent
-Copyright (c) 2024 Thant Min Htet. All rights reserved.
-
-Professional SWE-level code understanding and analysis capabilities that match
-the sophistication of advanced software engineering agents.
-
-This software is proprietary and confidential. No usage, modification,
-or distribution rights are granted without explicit written permission.
-"""
-
 import ast
 import inspect
 import re

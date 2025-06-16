@@ -23,7 +23,7 @@ It features AST-based code merging and comprehensive codebase indexing, intellig
 
 See [LICENSE](LICENSE) for full terms.
 
-Copyright © 2024 Thant Min Htet. All rights reserved.
+Copyright © 2025 Thant Min Htet. All rights reserved.
 
 ## Contact
 
