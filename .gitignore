@@ -9,3 +9,9 @@ wheels/
 # Virtual environments
 .venv
 .claude
+
+# Environment files
+*.env
+.env
+*/.env
+**/.env
