@@ -1,6 +1,12 @@
 """
+Codebase Indexing and Self-Awareness System - Cannister
+Copyright (c) 2024 Thant Min Htet. All rights reserved.
+
 Comprehensive codebase indexing and self-awareness system for Google ADK agents.
 This module provides deep understanding and navigation capabilities for codebases.
+
+This software is proprietary and confidential. No usage, modification,
+or distribution rights are granted without explicit written permission.
 """
 
 import ast
