@@ -1,0 +1,10 @@
+[project]
+name = "cannister"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "astor>=0.8.1",
+    "pip>=25.1.1",
+]
