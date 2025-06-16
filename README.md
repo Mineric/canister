@@ -1,5 +1,5 @@
 # Canister 
-- code agent - rescursively self improve (experimentation)
+- A canister is a containerized environment where code agents reside, designed for recursive self-improvement and experimentation.
 
 ## Overview
 
