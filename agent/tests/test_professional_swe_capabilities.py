@@ -13,13 +13,13 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from agent.tools.advanced_code_comprehension import code_comprehension_tool
-from agent.tools.professional_swe_merger import intelligent_merger_tool
+from agent.tools.code_comprehension import code_comprehension_tool
+from agent.tools.intelligent_merger import intelligent_merger_tool
 
 
-def test_advanced_code_comprehension():
-    """Test advanced code comprehension capabilities."""
-    print("🧠 Testing Advanced Code Comprehension")
+def test_code_comprehension():
+    """Test code comprehension capabilities."""
+    print("🧠 Testing Code Comprehension")
     print("=" * 45)
     
     try:
@@ -43,9 +43,9 @@ def test_advanced_code_comprehension():
         print()
 
 
-def test_professional_swe_merger():
-    """Test professional SWE-level merger capabilities."""
-    print("🎓 Testing Professional SWE-Level Merger")
+def test_intelligent_merger():
+    """Test intelligent merger capabilities."""
+    print("🎓 Testing Intelligent Merger")
     print("=" * 45)
     
     # Create a complex test scenario
@@ -372,10 +372,10 @@ if __name__ == "__main__":
     print("=" * 55)
     print()
     
-    # Test advanced code comprehension
-    test_advanced_code_comprehension()
-    
-    # Test professional SWE merger
-    test_professional_swe_merger()
+    # Test code comprehension
+    test_code_comprehension()
+
+    # Test intelligent merger
+    test_intelligent_merger()
     
     print("🎉 Professional SWE-Level Test Suite Completed!")

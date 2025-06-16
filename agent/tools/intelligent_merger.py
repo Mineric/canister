@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 from google.adk.tools import FunctionTool
 
 from .code_tools import ASTCodeMerger, MergeContext, MergeImpact
-from .advanced_code_comprehension import AdvancedCodeComprehension, RefactoringOpportunity
+from .code_comprehension import AdvancedCodeComprehension, RefactoringOpportunity
 
 
 @dataclass
@@ -855,7 +855,7 @@ def intelligent_merger_tool() -> FunctionTool:
         try:
             # Initialize professional merger
             from .codebase_indexer import get_global_indexer
-            from .advanced_code_comprehension import AdvancedCodeComprehension
+            from .code_comprehension import AdvancedCodeComprehension
 
             indexer = get_global_indexer()
             comprehension = AdvancedCodeComprehension(indexer)

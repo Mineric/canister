@@ -23,10 +23,10 @@ from .tools.code_tools import (
     enhanced_ast_code_merger_tool,
     code_structure_analyzer_tool
 )
-from .tools.advanced_code_comprehension import (
+from .tools.code_comprehension import (
     code_comprehension_tool
 )
-from .tools.professional_swe_merger import (
+from .tools.intelligent_merger import (
     intelligent_merger_tool
 )
 from .tools.codebase_indexer import (

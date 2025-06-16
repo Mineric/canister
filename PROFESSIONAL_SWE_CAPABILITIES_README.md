@@ -8,7 +8,7 @@ The Canister agent has been successfully enhanced to match the sophistication of
 
 ### **1. Advanced Code Comprehension Engine** ✅
 
-**File:** `agent/tools/advanced_code_comprehension.py`
+**File:** `agent/tools/code_comprehension.py`
 
 #### **Architectural Pattern Detection**
 - **MVC Pattern Recognition**: Detects Model-View-Controller architecture
@@ -36,7 +36,7 @@ The Canister agent has been successfully enhanced to match the sophistication of
 
 ### **2. Professional SWE-Level Code Merger** ✅
 
-**File:** `agent/tools/professional_swe_merger.py`
+**File:** `agent/tools/intelligent_merger.py`
 
 #### **Intelligent Decision Making**
 - **Professional Merge Strategies**: Conservative, Aggressive, Intelligent, Architectural
