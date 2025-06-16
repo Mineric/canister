@@ -478,6 +478,22 @@ if self.use_indexer:
     dependencies = self.indexer.get_dependencies(self.file_path)
 ```
 
+## 🔮 **Future Enhancements**
+
+- **Multi-Language Support**: Extend beyond Python to other languages
+- **Real-Time Monitoring**: File system watching for automatic updates
+- **Code Metrics Dashboard**: Visual representation of codebase health
+- **Integration APIs**: RESTful APIs for external tool integration
+- **Machine Learning**: Pattern recognition and code suggestion improvements
+
+## 🎯 **Best Practices**
+
+1. **Regular Indexing**: Keep indexes up-to-date with code changes
+2. **Selective Exclusions**: Use appropriate exclusion patterns for performance
+3. **Query Optimization**: Use specific search criteria for better results
+4. **Cache Management**: Monitor cache size and performance
+5. **Error Monitoring**: Review indexing errors and syntax issues
+
 ---
 
 **Next**: Explore the [AST Code Tools](./ast-code-tools.md) for advanced code manipulation.

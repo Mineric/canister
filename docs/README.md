@@ -24,10 +24,6 @@ Comprehensive documentation for the Canister Agent - a coding agent designed to 
 - [**Testing Guide**](./testing.md) - Testing strategies and examples
 - [**Contributing**](./contributing.md) - Contribution guidelines
 
-### **Detailed References**
-- [**Memory Engine (Detailed)**](./memory-engine-detailed.md) - Comprehensive memory system guide
-- [**Codebase Indexer (Detailed)**](./codebase-indexer-detailed.md) - In-depth indexing documentation
-
 ## 🚀 **Quick Start**
 
 ### **Basic Usage**
@@ -191,6 +187,16 @@ Start with the [**Agent Overview**](./agent-overview.md) for a comprehensive int
 - **Developers**: Development Guide → API Reference → Testing Guide
 - **Advanced Users**: Memory Engine → Professional SWE → AST Code Tools
 - **Enterprise**: ADK Integration → Configuration → Professional SWE
+
+## 📊 **Documentation Overview**
+
+This documentation covers **13 comprehensive guides** organized into 4 main categories:
+- **4 Core Systems**: Agent, Tools, Memory, Codebase Indexer
+- **2 Advanced Features**: AST Tools, Professional SWE
+- **3 Integration & Deployment**: ADK, Configuration, API Reference
+- **3 Development**: Development, Testing, Contributing
+
+All **19 tools**, **memory system**, **codebase indexer**, and **professional SWE capabilities** are fully documented with examples, API references, and best practices.
 
 ## 🔗 **External Resources**
 
