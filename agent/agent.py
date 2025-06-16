@@ -15,8 +15,7 @@ from .tools.tools import (
     directory_operations_tool,
     file_management_tool,
     terminal_command_tool,
-    code_analysis_tool,  # New import
-    docker_sandbox_tool  # New import
+    docker_sandbox_tool
 )
 from .tools.code_tools import (
     ast_code_merger_tool,
@@ -53,7 +52,6 @@ def create_agent():
         terminal_command_tool(),
 
         # Code analysis and manipulation tools
-        code_analysis_tool(),
         docker_sandbox_tool(),
         ast_code_merger_tool(),
         enhanced_ast_code_merger_tool(),

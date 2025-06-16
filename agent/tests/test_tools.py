@@ -141,18 +141,6 @@ class Calculator:
         import shutil
         shutil.rmtree(self.temp_dir, ignore_errors=True)
     
-    def test_code_analysis_tool(self):
-        """Test code analysis functionality."""
-        try:
-            from agent.tools.tools import code_analysis_tool
-            tool = code_analysis_tool()
-            
-            result = tool.func(self.test_py_file)
-            self.assertIn("Function 'hello'", result)
-            self.assertIn("Class 'Calculator'", result)
-            
-        except ImportError as e:
-            self.skipTest(f"Could not import tool: {e}")
 
 
 if __name__ == "__main__":
