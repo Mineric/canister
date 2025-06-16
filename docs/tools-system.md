@@ -7,7 +7,7 @@ Comprehensive documentation for the Canister Agent's 19-tool ecosystem, providin
 The Canister Agent features a sophisticated tool system with 19 specialized tools organized into 5 categories:
 - **Basic Utilities** (7 tools): Essential development utilities
 - **AST Code Tools** (3 tools): Advanced code manipulation
-- **Professional SWE** (2 tools): Professional-grade engineering capabilities
+- **Professional SWE** (2 tools): engineering capabilities
 - **Memory System** (3 tools): Context and memory management
 - **Codebase Indexing** (4 tools): Code analysis and search
 
