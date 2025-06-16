@@ -1,13 +1,3 @@
-"""
-Professional SWE-Level Code Merger - Canister Agent
-Copyright (c) 2024 Thant Min Htet. All rights reserved.
-
-Advanced code merging capabilities that match the sophistication of professional
-software engineering agents, with deep code understanding and intelligent decision making.
-
-This software is proprietary and confidential. No usage, modification,
-or distribution rights are granted without explicit written permission.
-"""
 
 import ast
 import re

@@ -1,11 +1,3 @@
-"""
-Cannister - Advanced AI Coding Assistant
-Copyright (c) 2024 Thant Min Htet. All rights reserved.
-
-This software is proprietary and confidential. No usage, modification,
-or distribution rights are granted without explicit written permission.
-"""
-
 from google.adk.agents import LlmAgent
 from google.adk.models.lite_llm import LiteLlm
 from google.adk.sessions import InMemorySessionService, VertexAiSessionService
