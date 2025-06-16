@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Codebase Indexing and Self-Awareness System is a comprehensive solution that enables the Google ADK agent to deeply understand and navigate both its own codebase and external Python codebases. This system provides intelligent code search, dependency analysis, and self-reflection capabilities.
+The Codebase Indexing aim to be solution that enables the agent to be self aware by deeply understanding and navigating both its own codebase and external Python codebases. This system provides code search, dependency analysis, and self-reflection capabilities.
 
 ## Key Features
 
