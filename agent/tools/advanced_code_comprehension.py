@@ -740,9 +740,9 @@ class AdvancedCodeComprehension:
         return max(0.0, min(1.0, maintainability))
 
 
-def advanced_code_comprehension_tool() -> FunctionTool:
+def code_comprehension_tool() -> FunctionTool:
     """
-    Create a tool for advanced code comprehension and architectural analysis.
+    Create a tool for code comprehension and architectural analysis.
     """
 
     def analyze_codebase_architecture(

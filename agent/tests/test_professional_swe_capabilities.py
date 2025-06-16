@@ -13,8 +13,8 @@ from pathlib import Path
 project_root = Path(__file__).parent.parent.parent
 sys.path.insert(0, str(project_root))
 
-from agent.tools.advanced_code_comprehension import advanced_code_comprehension_tool
-from agent.tools.professional_swe_merger import professional_swe_merger_tool
+from agent.tools.advanced_code_comprehension import code_comprehension_tool
+from agent.tools.professional_swe_merger import intelligent_merger_tool
 
 
 def test_advanced_code_comprehension():
@@ -23,7 +23,7 @@ def test_advanced_code_comprehension():
     print("=" * 45)
     
     try:
-        comprehension_tool = advanced_code_comprehension_tool()
+        comprehension_tool = code_comprehension_tool()
         
         # Analyze the current project
         project_root_str = str(Path(__file__).parent.parent)
@@ -187,7 +187,7 @@ class UserService:
         
         try:
             # Test professional merger
-            professional_tool = professional_swe_merger_tool()
+            professional_tool = intelligent_merger_tool()
             
             # Test different strategies
             strategies = ["conservative", "intelligent", "architectural"]

@@ -824,10 +824,10 @@ class ProfessionalSWEMerger:
         }
 
 
-def professional_swe_merger_tool() -> FunctionTool:
+def intelligent_merger_tool() -> FunctionTool:
     """
-    Create a professional SWE-level code merger tool with advanced comprehension
-    and intelligent decision making capabilities.
+    Create an intelligent code merger tool with advanced comprehension
+    and professional-level decision making capabilities.
     """
 
     def merge_code_professionally(

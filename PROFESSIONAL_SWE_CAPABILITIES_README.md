@@ -80,7 +80,7 @@ The Canister agent has been successfully enhanced to match the sophistication of
 
 ## 🔧 **Available Tools**
 
-### **1. `advanced_code_comprehension_tool()`**
+### **1. `code_comprehension_tool()`**
 ```python
 # Comprehensive architectural analysis
 result = comprehension_tool.func(
@@ -99,7 +99,7 @@ result = comprehension_tool.func(
 - Technical debt assessment
 - Maintainability scoring
 
-### **2. `professional_swe_merger_tool()`**
+### **2. `intelligent_merger_tool()`**
 ```python
 # Professional-level code merging
 result = merger_tool.func(

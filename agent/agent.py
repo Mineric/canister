@@ -24,10 +24,10 @@ from .tools.code_tools import (
     code_structure_analyzer_tool
 )
 from .tools.advanced_code_comprehension import (
-    advanced_code_comprehension_tool
+    code_comprehension_tool
 )
 from .tools.professional_swe_merger import (
-    professional_swe_merger_tool
+    intelligent_merger_tool
 )
 from .tools.codebase_indexer import (
     codebase_indexer_tool,
@@ -57,9 +57,9 @@ def create_agent():
         docker_sandbox_tool(),
         ast_code_merger_tool(),
         enhanced_ast_code_merger_tool(),
-        professional_swe_merger_tool(),
+        intelligent_merger_tool(),
         code_structure_analyzer_tool(),
-        advanced_code_comprehension_tool(),
+        code_comprehension_tool(),
 
         # Codebase indexing and self-awareness tools
         codebase_indexer_tool(),
