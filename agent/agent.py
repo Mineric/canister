@@ -29,8 +29,7 @@ from .tools.codebase_indexer import (
     self_awareness_tool
 )
 
-from google.adk.sessions import InMemorySessionService
-from google.adk.code_executors import BuiltInCodeExecutor
+
 
 def create_agent():
     """Create an agent with multiple tools using Google ADK and OpenAI via LiteLLM."""
@@ -73,13 +72,18 @@ def create_agent():
             "Stay updated with best practices in software development, engage in self-improvement through iterative learning, and assist users in debugging, developing, and refining their software projects. "
             "Leverage your comprehensive understanding capabilities to facilitate efficient coding workflows, ensure code quality, and provide insightful solutions to complex technical problems."
         ),
-        tools=tools,
-        executor=BuiltInCodeExecutor(),
-        session_service=InMemorySessionService()
+        tools=tools
     )
 
     return agent
 
 
-# Create the agent instance
+# Create the agent instance lazily
 root_agent = create_agent()
+
+def get_agent():
+    """Get or create the root agent instance."""
+    global root_agent
+    if root_agent is None:
+        root_agent = create_agent()
+    return root_agent

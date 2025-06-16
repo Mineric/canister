@@ -13,10 +13,10 @@ import ast
 import json
 import hashlib
 import sqlite3
-import sys
+
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional, Set, Tuple, Any, Union
+from typing import Dict, List, Optional, Set, Any, Union
 from dataclasses import dataclass, asdict
 from google.adk.tools import FunctionTool
 
@@ -649,7 +649,12 @@ def get_global_indexer() -> CodebaseIndexer:
     """Get or create the global indexer instance."""
     global _global_indexer
     if _global_indexer is None:
-        _global_indexer = CodebaseIndexer()
+        try:
+            _global_indexer = CodebaseIndexer()
+        except Exception as e:
+            # If indexer creation fails, create a minimal fallback
+            print(f"Warning: Could not create full indexer: {e}")
+            _global_indexer = CodebaseIndexer()
     return _global_indexer
 
 
@@ -913,7 +918,7 @@ def self_awareness_tool() -> FunctionTool:
             indexer = get_global_indexer()
 
             # First, ensure the agent's own codebase is indexed
-            import os
+
             agent_root = Path(__file__).parent.parent  # Go up to agent/ directory
 
             # Index the agent codebase if not already done
@@ -940,7 +945,7 @@ def self_awareness_tool() -> FunctionTool:
 
             if include_tools:
                 # Analyze available tools
-                tools_info = self._analyze_agent_tools(indexer, str(agent_root))
+                tools_info = _analyze_agent_tools(indexer, str(agent_root))
                 result_lines.extend([
                     "🛠️ Available Tools:",
                     *tools_info,
@@ -949,7 +954,7 @@ def self_awareness_tool() -> FunctionTool:
 
             if include_structure:
                 # Analyze codebase structure
-                structure_info = self._analyze_codebase_structure(indexer, str(agent_root))
+                structure_info = _analyze_codebase_structure(indexer, str(agent_root))
                 result_lines.extend([
                     "🏗️ Codebase Structure:",
                     *structure_info,
@@ -957,7 +962,7 @@ def self_awareness_tool() -> FunctionTool:
                 ])
 
             # Key capabilities
-            capabilities = self._identify_key_capabilities(indexer, str(agent_root))
+            capabilities = _identify_key_capabilities(indexer, str(agent_root))
             result_lines.extend([
                 "🎯 Key Capabilities:",
                 *capabilities,
@@ -969,7 +974,7 @@ def self_awareness_tool() -> FunctionTool:
         except Exception as e:
             return f"Error during self-analysis: {str(e)}"
 
-    def _analyze_agent_tools(self, indexer: CodebaseIndexer, agent_root: str) -> List[str]:
+    def _analyze_agent_tools(indexer: CodebaseIndexer, agent_root: str) -> List[str]:
         """Analyze available agent tools."""
         tools_info = []
 
@@ -995,7 +1000,7 @@ def self_awareness_tool() -> FunctionTool:
 
         return tools_info
 
-    def _analyze_codebase_structure(self, indexer: CodebaseIndexer, agent_root: str) -> List[str]:
+    def _analyze_codebase_structure(indexer: CodebaseIndexer, agent_root: str) -> List[str]:
         """Analyze the codebase structure."""
         structure_info = []
 
@@ -1021,7 +1026,7 @@ def self_awareness_tool() -> FunctionTool:
 
         return structure_info
 
-    def _identify_key_capabilities(self, indexer: CodebaseIndexer, agent_root: str) -> List[str]:
+    def _identify_key_capabilities(indexer: CodebaseIndexer, agent_root: str) -> List[str]:
         """Identify key capabilities based on code analysis."""
         capabilities = []
 

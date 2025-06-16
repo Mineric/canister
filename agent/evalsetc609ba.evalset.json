@@ -1,0 +1,28 @@
+{
+  "eval_set_id": "evalsetc609ba",
+  "name": "evalsetc609ba",
+  "description": null,
+  "eval_cases": [
+    {
+      "eval_id": "case57411a",
+      "conversation": [],
+      "session_input": {
+        "app_name": "agent",
+        "user_id": "user",
+        "state": {}
+      },
+      "creation_timestamp": 1750087154.499559
+    },
+    {
+      "eval_id": "casec6a9bd_test",
+      "conversation": [],
+      "session_input": {
+        "app_name": "agent",
+        "user_id": "user",
+        "state": {}
+      },
+      "creation_timestamp": 1750087511.612556
+    }
+  ],
+  "creation_timestamp": 1750087145.577915
+}
