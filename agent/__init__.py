@@ -1,6 +1,8 @@
-from .agent import root_agent
+from .agent import get_agent
 
-# Make root_agent available as 'agent' for convenience
-agent = root_agent
+# Make get_agent available as 'agent' for convenience
+def agent():
+    """Get the agent instance."""
+    return get_agent()
 
-__all__ = ['agent', 'root_agent']
+__all__ = ['agent', 'get_agent']
