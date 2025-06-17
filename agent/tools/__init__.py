@@ -8,8 +8,8 @@ from google.adk.tools import FunctionTool
 
 # Tool imports will be added as classes are implemented
 from .system import SystemTools
-# from .code import CodeTools  
-# from .search import SearchTools
+from .code import CodeTools  
+from .search import SearchTools
 # from .memory import MemoryTools
 # from .analysis import AnalysisTools
 
@@ -45,21 +45,21 @@ def get_all_tools() -> List[FunctionTool]:
         create_tool(SystemTools, "get_time"),
     ])
     
-    # Code tools (will be implemented in phase 2)
-    # tools.extend([
-    #     create_tool(CodeTools, "merge"),
-    #     create_tool(CodeTools, "analyze_structure"),
-    #     create_tool(CodeTools, "index_codebase"),
-    #     create_tool(CodeTools, "analyze_file"),
-    # ])
+    # Code tools
+    tools.extend([
+        create_tool(CodeTools, "merge"),
+        create_tool(CodeTools, "analyze_structure"),
+        create_tool(CodeTools, "index_codebase"),
+        create_tool(CodeTools, "analyze_file"),
+    ])
     
-    # Search tools (will be implemented in phase 2)
-    # tools.extend([
-    #     create_tool(SearchTools, "code"),
-    #     create_tool(SearchTools, "memory"),
-    #     create_tool(SearchTools, "similarity"),
-    #     create_tool(SearchTools, "context"),
-    # ])
+    # Search tools
+    tools.extend([
+        create_tool(SearchTools, "code"),
+        create_tool(SearchTools, "memory"),
+        create_tool(SearchTools, "similarity"),
+        create_tool(SearchTools, "context"),
+    ])
     
     # Memory tools (will be implemented in phase 3)
     # tools.extend([
