@@ -31,9 +31,17 @@ Assesses:
 - **Code Structure**: Organization and maintainability
 - **Best Practices**: Adherence to Python standards
 
+### **SWE-bench Evaluation** (`swe_bench_eval.py`, `swe_bench_harness.py`, `swe_bench_metrics.py`)
+Evaluates:
+- **Real-world Software Engineering**: GitHub issues from open-source projects
+- **Standardized Benchmarking**: Compare against other AI coding systems
+- **Multiple Datasets**: SWE-bench Lite, Verified, Full, and Multimodal
+- **Comprehensive Metrics**: Resolve rates, execution times, error analysis
+- **Official Integration**: Docker-based evaluation harness
+
 ### **Comprehensive Evaluation** (`eval_runner.py`)
 Orchestrates:
-- **Multi-dimensional Assessment**: All evaluation types
+- **Multi-dimensional Assessment**: All evaluation types including SWE-bench
 - **Scoring System**: Weighted performance metrics
 - **Grade Assignment**: A-F grading scale
 - **Report Generation**: Detailed analysis reports
@@ -43,12 +51,16 @@ Orchestrates:
 
 ### Run All Evaluations
 ```bash
-# Comprehensive evaluation suite
+# Comprehensive evaluation suite (includes SWE-bench)
 python agent/evals/eval_runner.py
 
 # Individual evaluations
 python agent/evals/performance_eval.py
 python agent/evals/code_quality_eval.py
+
+# SWE-bench evaluations
+python agent/evals/swe_bench_eval.py          # Quick SWE-bench test
+python agent/evals/swe_bench_harness.py       # Full SWE-bench with Docker
 ```
 
 ### Evaluation Outputs

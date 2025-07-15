@@ -78,17 +78,59 @@ class EvaluationRunner:
         print("📦 Running Import Evaluation...")
         try:
             from agent.tests.test_imports import main as run_import_tests
-            
+
             # Capture import test results
             # This would need to be modified to return results instead of printing
             self.results["imports"] = {"status": "completed"}
-            
+
             print("✅ Import evaluation completed")
             return True
-            
+
         except Exception as e:
             print(f"❌ Import evaluation failed: {e}")
             self.results["imports"] = {"error": str(e)}
+            return False
+
+    def run_swe_bench_evaluation(self):
+        """Run SWE-bench evaluation."""
+        print("🎯 Running SWE-bench Evaluation...")
+        try:
+            from .swe_bench_eval import SWEBenchEvaluator
+            from .swe_bench_config import create_evaluation_config
+
+            # Create a quick test configuration
+            config = create_evaluation_config(
+                preset="quick_test",
+                max_instances=2,
+                timeout_per_instance=300
+            )
+
+            evaluator = SWEBenchEvaluator()
+
+            # Run a minimal evaluation
+            report = evaluator.run_evaluation(
+                dataset_name=config.dataset.value,
+                max_instances=config.max_instances
+            )
+
+            # Store results
+            self.results["swe_bench"] = {
+                "total_instances": report.total_instances,
+                "resolved_count": report.resolved_count,
+                "resolve_rate": report.resolve_rate,
+                "average_time": report.average_time_per_instance,
+                "status": "completed"
+            }
+
+            print(f"✅ SWE-bench evaluation completed")
+            print(f"   Resolved: {report.resolved_count}/{report.total_instances}")
+            print(f"   Resolve rate: {report.resolve_rate:.1%}")
+
+            return True
+
+        except Exception as e:
+            print(f"❌ SWE-bench evaluation failed: {e}")
+            self.results["swe_bench"] = {"error": str(e)}
             return False
     
     def generate_comprehensive_report(self) -> Dict[str, Any]:
@@ -168,6 +210,7 @@ def main():
         ("Performance", runner.run_performance_evaluation),
         ("Code Quality", runner.run_code_quality_evaluation),
         ("Import Dependencies", runner.run_import_evaluation),
+        ("SWE-bench", runner.run_swe_bench_evaluation),
     ]
     
     completed = 0
