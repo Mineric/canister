@@ -10,25 +10,38 @@ flowchart TD
     structure[Structure Index]
     prompts[Prompt Repository]
     capabilities[Capability Registry]
+    semantic[Semantic Memory]
     planner[Planner]
     executor[Executor]
     evaluator[Evaluator]
+    policy[Policy Brain]
+    safety[Safety Governor]
     tools[ADK Tools]
     agent[LlmAgent]
 
     telemetry --> capabilities
     telemetry --> structure
     telemetry --> prompts
+    telemetry --> semantic
 
     capabilities --> planner
     structure --> planner
     prompts --> planner
+    semantic --> planner
 
     planner --> executor
     executor --> evaluator
     evaluator --> telemetry
     executor --> structure
     evaluator --> prompts
+
+    evaluator --> policy
+    telemetry --> policy
+    policy --> planner
+
+    executor --> safety
+    planner --> safety
+    safety --> telemetry
 
     planner --> tools
     executor --> tools
