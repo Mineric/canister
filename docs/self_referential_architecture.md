@@ -161,7 +161,6 @@ Telemetry captures activity across services, knowledge stores feed the planner, 
 7. **Safety Governor Enhancements** (risk scoring and rollback).
 
 ## Immediate Next Steps
-- Stand up an issue board that maps each item in the phased roadmap to tickets/owners.
 - Begin Phase 1 tasks: draft experiment registry schema and unit-test harnesses for telemetry, planner, executor, and evaluator.
 - Prototype executor action handlers (ApplyPatch, PromptUpdate, RunCommand) behind safety checks and wire them to the planner-generated steps.
 - Implement the first evaluator runners (pytest smoke suite, lint) and integrate them into the executor → evaluator hand-off.
