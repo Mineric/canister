@@ -14,7 +14,11 @@ import subprocess
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
-from datasets import load_dataset
+# Optional datasets import with graceful fallback
+try:
+    from datasets import load_dataset  # type: ignore
+except Exception:  # pragma: no cover - handled at runtime
+    load_dataset = None  # type: ignore
 
 # Add project root to path for imports
 import sys
@@ -253,34 +257,83 @@ class SWEBenchEvaluator:
         """Initialize evaluator with agent."""
         self.agent_interface = SWEBenchAgentInterface(agent)
         
-    def load_dataset(self, dataset_name: str = "princeton-nlp/SWE-bench_Lite", 
-                    split: str = "test", max_instances: Optional[int] = None) -> List[SWEBenchInstance]:
-        """Load SWE-bench dataset instances."""
+    def load_dataset(
+        self,
+        dataset_name: str = "princeton-nlp/SWE-bench_Lite",
+        split: str = "test",
+        max_instances: Optional[int] = None,
+        local_path: Optional[str] = None,
+    ) -> List[SWEBenchInstance]:
+        """Load SWE-bench dataset instances, with optional local fallback."""
+
+        env_local_path = os.getenv("SWE_BENCH_DATASET_PATH")
+        local_path = local_path or env_local_path
+        if local_path:
+            print(f"Loading SWE-bench instances from local path: {local_path}")
+            return self._load_local_dataset(local_path, max_instances=max_instances)
+
         print(f"Loading dataset: {dataset_name}")
-        
-        dataset = load_dataset(dataset_name, split=split)
-        
-        instances = []
+
+        if load_dataset is None:
+            raise RuntimeError(
+                "datasets library not available. Supply local_path or install datasets."
+            )
+
+        try:
+            dataset = load_dataset(dataset_name, split=split)
+        except Exception as exc:
+            raise RuntimeError(
+                f"Failed to load dataset '{dataset_name}'. Provide local_path or ensure datasets is configured."
+            ) from exc
+
+        instances: List[SWEBenchInstance] = []
         for i, item in enumerate(dataset):
             if max_instances and i >= max_instances:
                 break
-                
-            instance = SWEBenchInstance(
-                instance_id=item['instance_id'],
-                repo=item['repo'],
-                base_commit=item['base_commit'],
-                patch=item['patch'],
-                test_patch=item['test_patch'],
-                problem_statement=item['problem_statement'],
-                hints_text=item.get('hints_text', ''),
-                created_at=item['created_at'],
-                version=item['version'],
-                FAIL_TO_PASS=item['FAIL_TO_PASS'],
-                PASS_TO_PASS=item['PASS_TO_PASS']
-            )
-            instances.append(instance)
-            
+            instances.append(self._convert_item_to_instance(item))
+
         print(f"Loaded {len(instances)} instances")
+        return instances
+
+    # ------------------------------------------------------------------
+    # Dataset helpers
+    # ------------------------------------------------------------------
+
+    def _convert_item_to_instance(self, item: Dict[str, Any]) -> SWEBenchInstance:
+        return SWEBenchInstance(
+            instance_id=item["instance_id"],
+            repo=item["repo"],
+            base_commit=item["base_commit"],
+            patch=item["patch"],
+            test_patch=item.get("test_patch", ""),
+            problem_statement=item["problem_statement"],
+            hints_text=item.get("hints_text", ""),
+            created_at=item.get("created_at", ""),
+            version=item.get("version", ""),
+            FAIL_TO_PASS=item.get("FAIL_TO_PASS", []),
+            PASS_TO_PASS=item.get("PASS_TO_PASS", []),
+        )
+
+    def _load_local_dataset(
+        self,
+        path: str,
+        *,
+        max_instances: Optional[int] = None,
+    ) -> List[SWEBenchInstance]:
+        file_path = Path(path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"Local dataset not found: {path}")
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        instances: List[SWEBenchInstance] = []
+        for i, item in enumerate(data):
+            if max_instances and i >= max_instances:
+                break
+            instances.append(self._convert_item_to_instance(item))
+
+        print(f"Loaded {len(instances)} instances from local dataset")
         return instances
     
     def evaluate_instances(self, instances: List[SWEBenchInstance]) -> List[SWEBenchResult]:

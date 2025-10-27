@@ -1,0 +1,15 @@
+[
+  {
+    "instance_id": "sample__repo-1",
+    "repo": "owner/sample-repo",
+    "base_commit": "abcdef1234567890abcdef1234567890abcdef12",
+    "patch": "",
+    "test_patch": "",
+    "problem_statement": "Sample issue description for testing the SWE-bench evaluator.",
+    "hints_text": "Review the configuration parser for missing defaults.",
+    "created_at": "2024-01-01T00:00:00",
+    "version": "1.0",
+    "FAIL_TO_PASS": ["tests/test_config.py::test_missing_default"],
+    "PASS_TO_PASS": ["tests/test_config.py::test_existing_default"]
+  }
+]
