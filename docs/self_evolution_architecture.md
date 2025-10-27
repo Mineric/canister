@@ -23,8 +23,8 @@ flowchart TD
     end
 
     subgraph Interface
-        tools[ADK Tools\n(planner / executor / prompt)]
-        agent[LlmAgent]
+    tools["ADK Tools<br/>(planner / executor / prompt)"]
+    agent[LlmAgent]
     end
 
     telemetry --> capabilities
