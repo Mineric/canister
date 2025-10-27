@@ -3,48 +3,52 @@
 This document outlines the target architecture and implementation plan required to transform the agent into a self-improving system. Components are grouped into core "organs" with responsibilities, key collaborations, and concrete implementation tasks.
 
 ## Architecture Overview
+
 ```mermaid
-flowchart LR
+flowchart TD
     subgraph Observability
-        T[Telemetry Spine]
+        telemetry[Telemetry Spine]
     end
 
     subgraph Knowledge
-        SR[Structure Index]
-        PR[Prompt Repository]
-        CR[Capability Registry]
+        structure[Structure Index]
+        prompts[Prompt Repository]
+        capabilities[Capability Registry]
     end
 
     subgraph Reasoning
-        PL[Planner]
-        EX[Executor]
-        EV[Evaluator]
+        planner[Planner]
+        executor[Executor]
+        evaluator[Evaluator]
     end
 
     subgraph Interface
-        ADK[ADK Tools \n (planner/executor/prompt)]
-        Agent[LlmAgent]
+        tools[ADK Tools\n(planner / executor / prompt)]
+        agent[LlmAgent]
     end
 
-    T --> CR
-    T --> SR
-    T --> PR
-    CR --> PL
-    SR --> PL
-    PR --> PL
-    PL --> EX
-    EX --> EV
-    EV --> T
-    EV --> PR
-    EX --> SR
-    PR --> ADK
-    PL --> ADK
-    EX --> ADK
-    ADK --> Agent
-    Agent --> T
+    telemetry --> capabilities
+    telemetry --> structure
+    telemetry --> prompts
+
+    capabilities --> planner
+    structure --> planner
+    prompts --> planner
+
+    planner --> executor
+    executor --> evaluator
+    evaluator --> telemetry
+    executor --> structure
+    evaluator --> prompts
+
+    planner --> tools
+    executor --> tools
+    prompts --> tools
+    tools --> agent
+    agent --> telemetry
 ```
 
-The diagram highlights the current scaffold: telemetry captures activity across services, knowledge stores (structure index, prompt repository, capability registry) feed the planner, which hands plans to the executor and evaluator. ADK-facing tools expose planner/executor/prompt capabilities to the agent while the telemetry spine closes the feedback loop.
+Telemetry captures activity across services, knowledge stores feed the planner, and plans flow through executor and evaluator before surfacing via ADK tools to the agent. Telemetry closes the loop for continuous improvement.
 
 ## 1. Observation Spine
 - **Purpose**: Capture every significant event (tool invocation, plan step, test result, anomalies) with timing and outcome metadata.
