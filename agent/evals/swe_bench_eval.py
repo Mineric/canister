@@ -332,11 +332,27 @@ class SWEBenchEvaluator:
             agent_config={
                 "agent_name": "Canister Agent",
                 "model": "gpt-4o",
-                "tools_count": len(self.agent_interface.agent.tools) if hasattr(self.agent_interface.agent, 'tools') else 0
+                "tools_count": self._safe_tools_count()
             }
         )
         
         return report
+
+    def _safe_tools_count(self) -> int:
+        """Return number of tools if available and countable."""
+
+        agent = getattr(self.agent_interface, "agent", None)
+        if agent is None:
+            return 0
+
+        tools = getattr(agent, "tools", None)
+        if tools is None:
+            return 0
+
+        try:
+            return len(tools)
+        except TypeError:
+            return 0
     
     def save_report(self, report: SWEBenchEvaluationReport, output_path: Optional[str] = None):
         """Save evaluation report to file."""

@@ -23,7 +23,12 @@ from agent.core.prompt_repository import get_prompt_repository
 def planner_tool() -> FunctionTool:
     """Return a tool that generates a simple plan for a provided goal."""
 
-    def plan(goal: str, required_tags: str = "") -> str:
+    def plan(
+        goal: str,
+        required_tags: str = "",
+        new_prompt_content: str = "",
+        evaluation_suite: str = "basic",
+    ) -> str:
         planner = get_planner()
         telemetry = get_telemetry()
         prompt_repo = get_prompt_repository()
@@ -31,13 +36,33 @@ def planner_tool() -> FunctionTool:
         tags = [tag.strip() for tag in required_tags.split(",") if tag.strip()]
         telemetry.log_event("planner_tool.request", goal=goal, tags=tags)
 
-        plan_obj = planner.create_plan(goal, required_tags=tags)
-        lines = [f"🧭 Plan for goal: {goal}"]
+        if goal.startswith("prompt:"):
+            prompt_id = goal.split(":", 1)[1].strip()
+            if not prompt_id:
+                return "Error: Provide a prompt id after 'prompt:'"
+            if not new_prompt_content:
+                return "Error: new_prompt_content is required for prompt improvement goals"
+            plan_obj = planner.create_prompt_improvement_plan(
+                prompt_id,
+                new_prompt_content,
+                evaluation_suite=evaluation_suite,
+            )
+        else:
+            plan_obj = planner.create_plan(goal, required_tags=tags)
+
+        lines = [f"🧭 Plan for goal: {plan_obj.goal}"]
         for idx, step in enumerate(plan_obj.steps, 1):
             lines.append(f"{idx}. {step.description}")
             if step.capability:
                 lines.append(f"   Capability: {step.capability}")
             lines.append(f"   Action: {step.action}")
+            if "content" in step.parameters:
+                preview = step.parameters["content"]
+                if len(preview) > 80:
+                    preview = preview[:80] + "..."
+                lines.append(f"   Content Preview: {preview}")
+            if "suite" in step.parameters:
+                lines.append(f"   Evaluation Suite: {step.parameters['suite']}")
 
         lines.append("")
         lines.append("📚 Registered prompts:")
@@ -52,9 +77,15 @@ def planner_tool() -> FunctionTool:
 
 
 def executor_tool() -> FunctionTool:
-    """Return a tool that executes a dummy plan for demonstration purposes."""
+    """Return a tool that executes a plan and reports outcomes."""
 
-    def execute(goal: str, required_tags: str = "", run_evaluator: bool = False) -> str:
+    def execute(
+        goal: str,
+        required_tags: str = "",
+        run_evaluator: bool = False,
+        new_prompt_content: str = "",
+        evaluation_suite: str = "basic",
+    ) -> str:
         planner = get_planner()
         executor = get_executor()
         evaluator = get_evaluator()
@@ -62,12 +93,39 @@ def executor_tool() -> FunctionTool:
         prompt_repo = get_prompt_repository()
 
         tags = [tag.strip() for tag in required_tags.split(",") if tag.strip()]
-        plan_obj = planner.create_plan(goal, required_tags=tags)
+        if goal.startswith("prompt:"):
+            prompt_id = goal.split(":", 1)[1].strip()
+            if not prompt_id:
+                return "Error: Provide a prompt id after 'prompt:'"
+            if not new_prompt_content:
+                return "Error: new_prompt_content is required for prompt improvement goals"
+            plan_obj = planner.create_prompt_improvement_plan(
+                prompt_id,
+                new_prompt_content,
+                evaluation_suite=evaluation_suite,
+            )
+        else:
+            plan_obj = planner.create_plan(goal, required_tags=tags)
         result = executor.execute_plan(plan_obj)
 
-        lines = [f"🚀 Execution result for goal: {goal}"]
+        lines = [f"🚀 Execution result for goal: {plan_obj.goal}"]
         lines.append(f"Outcome: {'success' if result.success else 'failure'}")
         lines.append(f"Details: {result.detail}")
+
+        if result.data:
+            for key, value in result.data.items():
+                if key.startswith("prompt_version:"):
+                    prompt_id = key.split(":", 1)[1]
+                    lines.append(f"   - Staged version for {prompt_id}: {value}")
+                if key.startswith("prompt_eval:"):
+                    prompt_id = key.split(":", 1)[1]
+                    evaluation = value
+                    lines.append(
+                        f"   - Evaluation {prompt_id}: {'pass' if evaluation.get('success') else 'fail'}"
+                    )
+                if key.startswith("prompt_active:"):
+                    prompt_id = key.split(":", 1)[1]
+                    lines.append(f"   - Active version for {prompt_id}: {value}")
 
         if run_evaluator:
             report = evaluator.evaluate(EvaluationRequest())

@@ -2,6 +2,7 @@ from datetime import datetime
 import os
 import subprocess
 from pathlib import Path
+from typing import Dict
 from google.adk.tools import FunctionTool
 
 def get_current_time_tool() -> FunctionTool:
@@ -15,22 +16,54 @@ def get_current_time_tool() -> FunctionTool:
 
 
 def calculator_tool() -> FunctionTool:
-    """Create a calculator tool for basic mathematical operations."""
+    """Create a calculator tool. Accepts either an expression or explicit operation."""
 
-    def calculator(operation: str, a: float, b: float) -> str:
-        """Perform basic mathematical operations (add, subtract, multiply, divide)."""
-        operations = {
-            "add": lambda x, y: x + y,
-            "subtract": lambda x, y: x - y,
-            "multiply": lambda x, y: x * y,
-            "divide": lambda x, y: x / y if y != 0 else "Error: Division by zero"
-        }
+    def calculator(*args: str) -> str:
+        """Evaluate mathematical input.
 
-        if operation.lower() in operations:
-            result = operations[operation.lower()](a, b)
+        - Single argument: treated as a Python expression (e.g., "2 + 2").
+        - Three arguments: operation name plus two operands (e.g., "add", "2", "3").
+        """
+
+        if len(args) == 1:
+            expression = args[0]
+            env: Dict[str, float] = {}
+            try:
+                segments = [segment.strip() for segment in expression.replace("\n", ";").split(";") if segment.strip()]
+                result = None
+                for segment in segments:
+                    if "=" in segment:
+                        exec(segment, {"__builtins__": {}}, env)
+                        result = None
+                    else:
+                        result = eval(segment, {"__builtins__": {}}, env)
+                return str(result) if result is not None else ""
+            except Exception as exc:
+                return f"Error: unable to evaluate expression ({exc})"
+
+        if len(args) == 3:
+            operation, a_str, b_str = args
+            try:
+                a = float(a_str)
+                b = float(b_str)
+            except ValueError:
+                return "Error: operands must be numbers"
+
+            operations = {
+                "add": lambda x, y: x + y,
+                "subtract": lambda x, y: x - y,
+                "multiply": lambda x, y: x * y,
+                "divide": lambda x, y: x / y if y != 0 else "Error: Division by zero",
+            }
+
+            func = operations.get(operation.lower())
+            if not func:
+                return "Error: Invalid operation. Use add, subtract, multiply, or divide"
+
+            result = func(a, b)
             return str(result)
-        else:
-            return "Error: Invalid operation. Use: add, subtract, multiply, or divide"
+
+        return "Error: Provide either an expression or an operation with two operands"
 
     return FunctionTool(calculator)
 
@@ -97,7 +130,7 @@ def directory_operations_tool() -> FunctionTool:
                         items.append(f"[{item_type}] {item.name}{size}")
 
                     if not items:
-                        return f"Directory '{path}' is empty"
+                        return f"Contents of '{path}':\n(empty)"
 
                     result = f"Contents of '{path}':\n" + "\n".join(items)
                     return result

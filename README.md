@@ -8,7 +8,7 @@ Canister is a containerized environment where an agent reside, designed for recu
 
 ## Overview
 Canister agent is a coding agent engineered for self-improvement within a canister—a safe, controlled environment.
-It now ships with a core observability spine, structural index, capability registry, planner/executor/evaluator scaffolding, and a prompt repository as documented in `docs/self_referntial_architecture.md`. These components lay the groundwork for combinatorial self-optimization (prompts, code, components, architecture) driven by telemetry and policy feedback loops.
+It now ships with a core observability spine, structural index, capability registry, planner/executor/evaluator scaffolding, and a prompt repository as documented in `docs/self_referential_architecture.md`. These components lay the groundwork for combinatorial self-optimization (prompts, code, components, architecture) driven by telemetry and policy feedback loops.
 
 ## Key Features
 
