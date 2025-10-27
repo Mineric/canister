@@ -1,4 +1,4 @@
-# Self-Evolution Architecture Blueprint
+# Self-referential Architecture Blueprint
 
 This document outlines the target architecture and implementation plan required to transform the agent into a self-improving system. Components are grouped into core "organs" with responsibilities, key collaborations, and concrete implementation tasks.
 
