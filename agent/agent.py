@@ -35,12 +35,14 @@ from .tools.memory_engine import (
 from .tools.planning_tools import (
     planner_tool,
     executor_tool,
+    prompt_repository_tool,
 )
 from .core.telemetry import get_telemetry
 from .core.capabilities import get_capability_registry
 from .core.planner import get_planner
 from .core.executor import get_executor
 from .core.evaluator import get_evaluator, EvaluationRequest
+from .core.prompt_repository import get_prompt_repository, PromptVersion
 
 
 TOOL_REGISTRY_DEFINITIONS = [
@@ -191,6 +193,13 @@ TOOL_REGISTRY_DEFINITIONS = [
         executor_tool,
         ["planning", "execution"],
     ),
+    (
+        "prompt_repository_tool",
+        "Manage prompt templates (list/register/stage/promote/rollback).",
+        "agent.tools.planning_tools.prompt_repository_tool",
+        prompt_repository_tool,
+        ["prompts"],
+    ),
 ]
 
 
@@ -203,6 +212,7 @@ def create_agent():
     planner = get_planner()
     executor = get_executor()
     evaluator = get_evaluator()
+    prompt_repo = get_prompt_repository()
 
     tools = []
     for (
@@ -242,6 +252,7 @@ def create_agent():
         planner_initialized=planner is not None,
         executor_initialized=executor is not None,
         evaluator_initialized=evaluator is not None,
+        prompt_repository_initialized=prompt_repo is not None,
     )
 
     return agent

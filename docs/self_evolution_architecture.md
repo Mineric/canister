@@ -2,6 +2,50 @@
 
 This document outlines the target architecture and implementation plan required to transform the agent into a self-improving system. Components are grouped into core "organs" with responsibilities, key collaborations, and concrete implementation tasks.
 
+## Architecture Overview
+```mermaid
+flowchart LR
+    subgraph Observability
+        T[Telemetry Spine]
+    end
+
+    subgraph Knowledge
+        SR[Structure Index]
+        PR[Prompt Repository]
+        CR[Capability Registry]
+    end
+
+    subgraph Reasoning
+        PL[Planner]
+        EX[Executor]
+        EV[Evaluator]
+    end
+
+    subgraph Interface
+        ADK[ADK Tools \n (planner/executor/prompt)]
+        Agent[LlmAgent]
+    end
+
+    T --> CR
+    T --> SR
+    T --> PR
+    CR --> PL
+    SR --> PL
+    PR --> PL
+    PL --> EX
+    EX --> EV
+    EV --> T
+    EV --> PR
+    EX --> SR
+    PR --> ADK
+    PL --> ADK
+    EX --> ADK
+    ADK --> Agent
+    Agent --> T
+```
+
+The diagram highlights the current scaffold: telemetry captures activity across services, knowledge stores (structure index, prompt repository, capability registry) feed the planner, which hands plans to the executor and evaluator. ADK-facing tools expose planner/executor/prompt capabilities to the agent while the telemetry spine closes the feedback loop.
+
 ## 1. Observation Spine
 - **Purpose**: Capture every significant event (tool invocation, plan step, test result, anomalies) with timing and outcome metadata.
 - **Key Modules**: `agent/core/telemetry.py`, optional async worker (`TelemetryWorker`) writing JSONL/SQLite.
@@ -41,10 +85,10 @@ This document outlines the target architecture and implementation plan required 
 
 ## 5. Prompt Repository
 - **Purpose**: Track, version, and evaluate the prompts that guide agent behaviour (system prompts, tool instructions, merge guidance).
-- **Key Modules**: `agent/core/prompt_repository.py` (planned).
+- **Key Modules**: `agent/core/prompt_repository.py`.
 - **Implementation Tasks**
-  - Define prompt metadata schema (id, version, owning capability, evaluation history, usage metrics).
-  - Add planner/executor flows for prompt improvements (draft -> evaluate -> stage -> release) with telemetry and rollback.
+  - Define prompt metadata schema (id, version, owning capability, evaluation history, usage metrics). ✅ (implemented in repository.)
+  - Add planner/executor flows for prompt improvements (draft -> evaluate -> stage -> release) with telemetry and rollback. (Tool scaffolding added; planner/executor integration pending.)
   - Integrate evaluator with prompt-specific suites (scenario replays, A/B tests, hallucination checks).
   - Emit telemetry per prompt version and maintain policy rules for promotion/demotion.
 
@@ -116,7 +160,8 @@ This document outlines the target architecture and implementation plan required 
 - Schedule a proof-of-concept run: instrument current tools with telemetry and execute a scripted self-improvement task end-to-end.
 - Connect executor to concrete action handlers (file edits, command execution) and integrate with forthcoming safety governor prototype.
 - Build evaluator runners (tests/lint/type-check) and wire automatic invocation after plan execution.
-- Design prompt repository module and evaluation harness (A/B comparisons, regression coverage) so prompt upgrades can be automated safely.
+- Wire planner/executor flows to the prompt repository (automatic stage/promote + evaluation gates).
+- Implement prompt evaluation harness (A/B comparisons, regression coverage) so upgrades can be automated safely.
 - Define experiment matrix covering improvements at prompt, code, component, and architectural levels (see next section).
 
 ## Improvement Combination Strategy

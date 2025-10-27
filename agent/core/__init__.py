@@ -11,4 +11,5 @@ __all__ = [
     "planner",
     "executor",
     "evaluator",
+    "prompt_repository",
 ]
