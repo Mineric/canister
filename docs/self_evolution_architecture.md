@@ -6,26 +6,15 @@ This document outlines the target architecture and implementation plan required 
 
 ```mermaid
 flowchart TD
-    subgraph Observability
-        telemetry[Telemetry Spine]
-    end
-
-    subgraph Knowledge
-        structure[Structure Index]
-        prompts[Prompt Repository]
-        capabilities[Capability Registry]
-    end
-
-    subgraph Reasoning
-        planner[Planner]
-        executor[Executor]
-        evaluator[Evaluator]
-    end
-
-    subgraph Interface
-    tools["ADK Tools<br/>(planner / executor / prompt)"]
+    telemetry[Telemetry Spine]
+    structure[Structure Index]
+    prompts[Prompt Repository]
+    capabilities[Capability Registry]
+    planner[Planner]
+    executor[Executor]
+    evaluator[Evaluator]
+    tools[ADK Tools]
     agent[LlmAgent]
-    end
 
     telemetry --> capabilities
     telemetry --> structure
