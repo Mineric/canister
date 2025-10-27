@@ -5,6 +5,7 @@ from pathlib import Path
 from typing import Dict, List, Optional, Set, Any, Tuple
 from dataclasses import dataclass, field
 from google.adk.tools import FunctionTool
+from agent.core.telemetry import get_telemetry
 
 from .code_tools import ASTCodeMerger, MergeContext, MergeImpact
 from .code_comprehension import AdvancedCodeComprehension, RefactoringOpportunity
@@ -59,6 +60,11 @@ class ProfessionalSWEMerger:
         self.comprehension = comprehension_engine or AdvancedCodeComprehension(indexer)
         self.merge_history = []
         self.architectural_context = {}
+        self.telemetry = get_telemetry()
+        self.telemetry.log_event(
+            "intelligent_merger.init",
+            has_indexer=indexer is not None,
+        )
         
     def professional_merge(
         self,
@@ -79,6 +85,13 @@ class ProfessionalSWEMerger:
         Returns:
             Comprehensive merge analysis and results
         """
+        self.telemetry.log_event(
+            "intelligent_merger.merge_start",
+            file_path=file_path,
+            strategy=strategy.strategy_type,
+            dry_run=dry_run,
+        )
+
         # Phase 1: Pre-merge architectural analysis
         architectural_analysis = self._analyze_architectural_context(file_path)
         
@@ -108,7 +121,7 @@ class ProfessionalSWEMerger:
                 file_path, ai_generated_code, impact_analysis
             )
         
-        return {
+        outcome = {
             "architectural_analysis": architectural_analysis,
             "impact_analysis": impact_analysis,
             "merge_decision": merge_decision,
@@ -118,11 +131,25 @@ class ProfessionalSWEMerger:
                 merge_decision, integrity_check, impact_analysis
             )
         }
+        self.telemetry.log_event(
+            "intelligent_merger.merge_complete",
+            file_path=file_path,
+            decision=merge_decision.decision_type,
+            confidence=merge_decision.confidence,
+            dry_run=dry_run,
+            success=merge_decision.decision_type == "merge",
+        )
+        return outcome
     
     def _analyze_architectural_context(self, file_path: str) -> Dict[str, Any]:
         """Analyze architectural context around the target file."""
         file_path_obj = Path(file_path)
         project_root = self._find_project_root(file_path_obj)
+        self.telemetry.log_event(
+            "intelligent_merger.architecture_analysis_start",
+            file_path=file_path,
+            project_root=str(project_root),
+        )
         
         # Get comprehensive architectural analysis
         arch_analysis = self.comprehension.analyze_codebase_architecture(str(project_root))
@@ -138,6 +165,12 @@ class ProfessionalSWEMerger:
             "architectural_constraints": self._identify_constraints(file_path, arch_analysis)
         }
         
+        self.telemetry.log_event(
+            "intelligent_merger.architecture_analysis_complete",
+            file_path=file_path,
+            design_score=file_context["design_principles_score"],
+            dependency_count=file_context["file_dependencies"].get("dependency_count", 0),
+        )
         return file_context
     
     def _find_project_root(self, file_path: Path) -> Path:
@@ -203,7 +236,12 @@ class ProfessionalSWEMerger:
         try:
             dependencies = list(self.indexer.get_dependencies(file_path))
             dependents = list(self.indexer.get_dependents(Path(file_path).stem))
-            
+            self.telemetry.log_event(
+                "intelligent_merger.dependencies_resolved",
+                file_path=file_path,
+                dependencies=len(dependencies),
+                dependents=len(dependents),
+            )
             return {
                 "dependencies": dependencies,
                 "dependents": dependents,
@@ -211,7 +249,12 @@ class ProfessionalSWEMerger:
                 "dependent_count": len(dependents),
                 "coupling_level": "high" if len(dependencies) > 10 else "medium" if len(dependencies) > 5 else "low"
             }
-        except Exception:
+        except Exception as exc:
+            self.telemetry.log_event(
+                "intelligent_merger.dependencies_failed",
+                file_path=file_path,
+                error=str(exc),
+            )
             return {"dependencies": [], "dependents": [], "coupling_level": "unknown"}
     
     def _identify_constraints(self, file_path: str, arch_analysis: Dict[str, Any]) -> List[str]:
@@ -733,14 +776,26 @@ class ProfessionalSWEMerger:
             with open(file_path, 'w', encoding='utf-8') as f:
                 f.write(merged_code)
 
-            return {
+            result = {
                 "success": True,
                 "backup_created": str(backup_path),
                 "merged_code_length": len(merged_code),
                 "merge_summary": merger.get_merge_summary()
             }
+            self.telemetry.log_event(
+                "intelligent_merger.execute_merge_success",
+                file_path=file_path,
+                merged_length=len(merged_code),
+                backup=str(backup_path),
+            )
+            return result
 
         except Exception as e:
+            self.telemetry.log_event(
+                "intelligent_merger.execute_merge_failed",
+                file_path=file_path,
+                error=str(e),
+            )
             return {
                 "success": False,
                 "error": str(e),
@@ -773,7 +828,7 @@ class ProfessionalSWEMerger:
             suggestions.append("Consider using dependency injection")
             suggestions.append("Group related imports into modules")
 
-        return {
+        result = {
             "refactoring_type": "incremental_integration",
             "suggestions": suggestions,
             "estimated_effort": "medium",
@@ -783,6 +838,12 @@ class ProfessionalSWEMerger:
                 "Improved architectural alignment"
             ]
         }
+        self.telemetry.log_event(
+            "intelligent_merger.refactor_suggested",
+            file_path=file_path,
+            suggestion_count=len(suggestions),
+        )
+        return result
 
     def _generate_professional_assessment(
         self,

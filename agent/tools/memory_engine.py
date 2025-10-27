@@ -20,6 +20,7 @@ from enum import Enum
 from google.adk.tools import FunctionTool
 from google.adk.sessions import InMemorySessionService, VertexAiSessionService
 from google.adk.memory import InMemoryMemoryService, VertexAiRagMemoryService
+from agent.core.telemetry import get_telemetry
 
 
 class MemoryMode(Enum):
@@ -128,6 +129,13 @@ class MemoryEngine:
     def __init__(self, config: MemoryConfig):
         """Initialize the memory engine."""
         self.config = config
+        self.telemetry = get_telemetry()
+        self.telemetry.log_event(
+            "memory_engine.init_start",
+            mode=config.mode.value,
+            enable_codebase=config.enable_codebase_integration,
+            enable_cleanup=config.enable_autonomous_cleanup,
+        )
         self.cache_dir = Path(config.cache_dir)
         self.cache_dir.mkdir(exist_ok=True)
         
@@ -158,12 +166,19 @@ class MemoryEngine:
         # Start autonomous cleanup if enabled
         if config.enable_autonomous_cleanup:
             self._start_autonomous_cleanup()
+            self.telemetry.log_event(
+                "memory_engine.cleanup_started",
+                interval_hours=config.cleanup_interval_hours,
+            )
+
+        self.telemetry.log_event("memory_engine.init_complete")
     
     def _initialize_services(self):
         """Initialize ADK memory services based on configuration."""
         if self.config.mode == MemoryMode.DEVELOPMENT:
             self.session_service = InMemorySessionService()
             self.memory_service = InMemoryMemoryService()
+            self.telemetry.log_event("memory_engine.services_initialized", backend="in_memory")
             
         elif self.config.mode == MemoryMode.PRODUCTION:
             if not self.config.project_id or not self.config.rag_corpus_name:
@@ -178,12 +193,19 @@ class MemoryEngine:
                 similarity_top_k=self.config.max_memory_results,
                 vector_distance_threshold=self.config.similarity_threshold
             )
+            self.telemetry.log_event(
+                "memory_engine.services_initialized",
+                backend="vertex_ai",
+                project_id=self.config.project_id,
+                rag_corpus=self.config.rag_corpus_name,
+            )
             
         elif self.config.mode == MemoryMode.HYBRID:
             # Use both local and cloud services
             self.session_service = InMemorySessionService()
             self.memory_service = InMemoryMemoryService()
             print("Hybrid mode: Using local services with cloud backup")
+            self.telemetry.log_event("memory_engine.services_initialized", backend="hybrid")
     
     async def add_memory(
         self,
@@ -216,6 +238,14 @@ class MemoryEngine:
         
         # Save to local cache
         self._save_local_memory()
+
+        self.telemetry.log_event(
+            "memory_engine.memory_added",
+            entry_id=entry_id,
+            context_type=context_type,
+            session_id=session_id,
+            user_id=user_id,
+        )
         
         return entry_id
     
@@ -280,6 +310,11 @@ class MemoryEngine:
         
         with open(memory_file, 'w') as f:
             json.dump(serializable_memory, f, indent=2)
+        self.telemetry.log_event(
+            "memory_engine.local_memory_saved",
+            entries=len(serializable_memory),
+            path=str(memory_file),
+        )
     
     def _load_local_memory(self):
         """Load local memory from disk."""
@@ -294,8 +329,17 @@ class MemoryEngine:
                     entry_id: MemoryEntry.from_dict(entry_data)
                     for entry_id, entry_data in data.items()
                 }
+                self.telemetry.log_event(
+                    "memory_engine.local_memory_loaded",
+                    entries=len(self.local_memory),
+                    path=str(memory_file),
+                )
             except Exception as e:
                 print(f"Warning: Could not load local memory: {e}")
+                self.telemetry.log_event(
+                    "memory_engine.local_memory_load_failed",
+                    error=str(e),
+                )
 
 
     async def search_memory(
@@ -309,6 +353,12 @@ class MemoryEngine:
         """Search memory with intelligent context prioritization."""
         max_results = max_results or self.config.max_memory_results
         results = []
+        self.telemetry.log_event(
+            "memory_engine.search_start",
+            query=query,
+            user_id=user_id,
+            include_codebase=include_codebase,
+        )
 
         # Search local memory
         local_results = self._search_local_memory(query, user_id, context_types)
@@ -321,7 +371,15 @@ class MemoryEngine:
 
         # Sort by priority and limit results
         results.sort(key=lambda x: x.priority.total_score if x.priority else 0, reverse=True)
-        return results[:max_results]
+        limited = results[:max_results]
+        self.telemetry.log_event(
+            "memory_engine.search_complete",
+            query=query,
+            result_count=len(limited),
+            local_hits=len(local_results),
+            include_codebase=include_codebase,
+        )
+        return limited
 
     def _search_local_memory(
         self,
@@ -362,7 +420,8 @@ class MemoryEngine:
 
             memory_entries = []
             for result in search_results[:5]:  # Limit codebase results
-                content = f"Code: {result.name} ({result.element_type}) in {result.file_path}"
+                element_type = getattr(result, "type", getattr(result, "element_type", "unknown"))
+                content = f"Code: {result.name} ({element_type}) in {result.file_path}"
                 if hasattr(result, 'signature') and result.signature:
                     content += f"\nSignature: {result.signature}"
 
@@ -373,7 +432,7 @@ class MemoryEngine:
                     timestamp=datetime.now(),
                     metadata={
                         "file_path": result.file_path,
-                        "element_type": result.element_type,
+                        "element_type": element_type,
                         "line_number": result.line_number,
                         "source": "codebase_indexer"
                     },
@@ -386,10 +445,20 @@ class MemoryEngine:
                 )
                 memory_entries.append(entry)
 
+            self.telemetry.log_event(
+                "memory_engine.codebase_search",
+                query=query,
+                results=len(memory_entries),
+            )
             return memory_entries
 
         except Exception as e:
             print(f"Warning: Codebase search failed: {e}")
+            self.telemetry.log_event(
+                "memory_engine.codebase_search_failed",
+                query=query,
+                error=str(e),
+            )
             return []
 
     async def get_context_summary(
@@ -440,11 +509,19 @@ class MemoryEngine:
                 except Exception as e:
                     print(f"Error in autonomous cleanup: {e}")
                     # Wait a bit before retrying
+                    self.telemetry.log_event(
+                        "memory_engine.cleanup_cycle_failed",
+                        error=str(e),
+                    )
                     self._shutdown_event.wait(300)  # 5 minutes
 
         self._cleanup_task = threading.Thread(target=cleanup_worker, daemon=True)
         self._cleanup_task.start()
         print(f"Started autonomous memory cleanup (interval: {self.config.cleanup_interval_hours}h)")
+        self.telemetry.log_event(
+            "memory_engine.cleanup_thread_started",
+            interval_hours=self.config.cleanup_interval_hours,
+        )
 
     def shutdown(self):
         """Shutdown the memory engine and cleanup tasks."""
@@ -452,10 +529,12 @@ class MemoryEngine:
             self._shutdown_event.set()
             self._cleanup_task.join(timeout=5)
             print("Memory engine shutdown complete")
+            self.telemetry.log_event("memory_engine.shutdown")
 
     async def _autonomous_cleanup(self):
         """Intelligent autonomous memory cleanup."""
         print("🧹 Running autonomous memory cleanup...")
+        self.telemetry.log_event("memory_engine.cleanup_cycle_start")
 
         # 1. Age-based cleanup
         age_removed = await self._cleanup_by_age()
@@ -474,6 +553,13 @@ class MemoryEngine:
             self._save_local_memory()
             print(f"✅ Autonomous cleanup completed: {total_removed} entries removed")
             print(f"   Age-based: {age_removed}, Pressure: {pressure_removed}, Duplicates: {duplicate_removed}")
+        self.telemetry.log_event(
+            "memory_engine.cleanup_cycle_complete",
+            removed_total=total_removed,
+            removed_age=age_removed,
+            removed_pressure=pressure_removed,
+            removed_duplicates=duplicate_removed,
+        )
 
     async def _cleanup_by_age(self) -> int:
         """Clean up old memories based on retention policies."""
