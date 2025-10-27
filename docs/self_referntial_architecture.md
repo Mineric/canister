@@ -161,14 +161,11 @@ Telemetry captures activity across services, knowledge stores feed the planner, 
 7. **Safety Governor Enhancements** (risk scoring and rollback).
 
 ## Immediate Next Steps
-- Track work items in an issue board aligned with the sequencing above.
-- Create unit tests scaffolding for telemetry, planner, executor, and evaluator modules.
-- Schedule a proof-of-concept run: instrument current tools with telemetry and execute a scripted self-improvement task end-to-end.
-- Connect executor to concrete action handlers (file edits, command execution) and integrate with forthcoming safety governor prototype.
-- Build evaluator runners (tests/lint/type-check) and wire automatic invocation after plan execution.
-- Wire planner/executor flows to the prompt repository (automatic stage/promote + evaluation gates).
-- Implement prompt evaluation harness (A/B comparisons, regression coverage) so upgrades can be automated safely.
-- Define experiment matrix covering improvements at prompt, code, component, and architectural levels (see next section).
+- Stand up an issue board that maps each item in the phased roadmap to tickets/owners.
+- Begin Phase 1 tasks: draft experiment registry schema and unit-test harnesses for telemetry, planner, executor, and evaluator.
+- Prototype executor action handlers (ApplyPatch, PromptUpdate, RunCommand) behind safety checks and wire them to the planner-generated steps.
+- Implement the first evaluator runners (pytest smoke suite, lint) and integrate them into the executor → evaluator hand-off.
+- Connect the planner/executor to the prompt repository tooling so staged prompt versions and promotions can be managed automatically during experiments.
 
 ## Improvement Combination Strategy
 - **Prompt Layer**: Version prompts in the repository, run targeted evaluation suites (scenario replays, hallucination audits), and gate promotion/rollback via telemetry + policy thresholds.
@@ -177,3 +174,27 @@ Telemetry captures activity across services, knowledge stores feed the planner, 
 - **System/Architecture Layer**: Stage disruptive changes (new memory backend, planner overhaul) with phased evaluations (unit → integration → shadow runs) and safety-governed rollouts.
 - **Experiment Matrix**: Maintain metadata describing the combination under test (prompt version, tool version, config flags). Evaluator consumes this to select check suites and telemetry logs results for policy learning.
 - **Policy Feedback**: Policy brain ingests experiment outcomes, adjusts preferred prompt/code/component combos, and schedules replans for underperforming variants.
+
+## Phased Self-Optimization Roadmap
+
+**Phase 1 – Experiment Foundations**
+- **Experiment Registry**: Implement `agent/core/experiment_registry.py` to record goals, combinations tried, evaluator metrics, and outcomes.
+- **Planner Enhancements**: Extend planner to accept `ImprovementGoal` objects, embed combination metadata in plans, and pre-register experiments.
+- **Executor Action Handlers**: Build concrete handlers for code edits, prompt updates, configuration toggles; route them through the Safety Governor (even if stubbed) and log diffs to the registry.
+- **Evaluator Bootstrap**: Add wrappers for pytest/lint/type-check runners and normalize results into comparable fitness scores.
+
+**Phase 2 – Policy & Safety Intelligence**
+- **Policy Brain**: Aggregate telemetry + experiment metrics, choose next goals (UCB/ε-greedy/Bayesian strategies), and manage exploration vs. exploitation.
+- **Safety Governor**: Introduce risk scoring, approval thresholds, and rollback routines (prompt demotion, git restores) tied into executor/evaluator events.
+- **Semantic Memory Hooks**: Persist embeddings of experiments/outcomes to accelerate future planning and avoid repeating bad combinations.
+
+**Phase 3 – Continuous Orchestration**
+- **Goal Manager / Scheduler**: Monitor telemetry alerts, policy recommendations, and manual queues to produce a prioritized stream of improvement goals.
+- **Self-Orchestrator Loop**: Implement a background runner that processes goals end-to-end (plan → execute → evaluate → log → policy) with retry/backoff logic and alerting on repeated failures.
+- **Observability Dashboards**: Surface experiment status, prompt/code versions, and success metrics for auditing and debugging.
+
+**Phase 4 – Advanced Optimization & Rollout**
+- **Search Strategy Upgrades**: Layer Bayesian optimization or bandit algorithms on top of policy decisions for multi-layer combinations.
+- **Layered/Cost-Aware Experiments**: Automate staged workflows (prompt-first, then code) and prioritize cheaper checks before expensive suites.
+- **Rollout & Governance**: Implement canary/shadow deployments for high-impact changes, document approval procedures, and keep automated rollback hooks active.
+- **End-to-End Validation**: Create integration tests that simulate full self-improvement cycles (prompt + code + policy) on controlled repos to ensure stability before production use.
