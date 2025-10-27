@@ -1,0 +1,283 @@
+{
+  "tools": [
+    {
+      "name": "get_current_time_tool",
+      "description": "Fetch the current system time.",
+      "entry_point": "agent.tools.tools.get_current_time_tool",
+      "tags": [
+        "utility",
+        "time"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "calculator_tool",
+      "description": "Perform arithmetic calculations.",
+      "entry_point": "agent.tools.tools.calculator_tool",
+      "tags": [
+        "utility",
+        "math"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "text_analyzer_tool",
+      "description": "Analyze text for statistics and metadata.",
+      "entry_point": "agent.tools.tools.text_analyzer_tool",
+      "tags": [
+        "utility",
+        "text"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "directory_operations_tool",
+      "description": "Inspect and manipulate filesystem directories.",
+      "entry_point": "agent.tools.tools.directory_operations_tool",
+      "tags": [
+        "filesystem"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "file_management_tool",
+      "description": "Read, write, and manage files.",
+      "entry_point": "agent.tools.tools.file_management_tool",
+      "tags": [
+        "filesystem"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "terminal_command_tool",
+      "description": "Execute shell commands in a controlled environment.",
+      "entry_point": "agent.tools.tools.terminal_command_tool",
+      "tags": [
+        "system",
+        "shell"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "docker_sandbox_tool",
+      "description": "Run Docker commands securely.",
+      "entry_point": "agent.tools.tools.docker_sandbox_tool",
+      "tags": [
+        "system",
+        "docker"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "ast_code_merger_tool",
+      "description": "Merge code snippets using AST heuristics.",
+      "entry_point": "agent.tools.code_tools.ast_code_merger_tool",
+      "tags": [
+        "code",
+        "merge"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "enhanced_ast_code_merger_tool",
+      "description": "Advanced AST-based merging for complex changes.",
+      "entry_point": "agent.tools.code_tools.enhanced_ast_code_merger_tool",
+      "tags": [
+        "code",
+        "merge"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "intelligent_merger_tool",
+      "description": "Professional-level merge assistant with architectural awareness.",
+      "entry_point": "agent.tools.intelligent_merger.intelligent_merger_tool",
+      "tags": [
+        "code",
+        "merge"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "code_structure_analyzer_tool",
+      "description": "Inspect code organization and structure.",
+      "entry_point": "agent.tools.code_tools.code_structure_analyzer_tool",
+      "tags": [
+        "code",
+        "analysis"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "code_comprehension_tool",
+      "description": "Provide deep code comprehension summaries.",
+      "entry_point": "agent.tools.code_comprehension.code_comprehension_tool",
+      "tags": [
+        "code",
+        "analysis"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "codebase_indexer_tool",
+      "description": "Index a codebase to build structural knowledge.",
+      "entry_point": "agent.tools.codebase_indexer.codebase_indexer_tool",
+      "tags": [
+        "code",
+        "indexing"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "code_search_tool",
+      "description": "Search indexed code elements.",
+      "entry_point": "agent.tools.codebase_indexer.code_search_tool",
+      "tags": [
+        "code",
+        "search"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "file_analysis_tool",
+      "description": "Generate detailed analysis of a file.",
+      "entry_point": "agent.tools.codebase_indexer.file_analysis_tool",
+      "tags": [
+        "code",
+        "analysis"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "self_awareness_tool",
+      "description": "Inspect the agent's own capabilities and structure.",
+      "entry_point": "agent.tools.codebase_indexer.self_awareness_tool",
+      "tags": [
+        "self-awareness"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "memory_search_tool",
+      "description": "Search the agent's memory store for relevant context.",
+      "entry_point": "agent.tools.memory_engine.memory_search_tool",
+      "tags": [
+        "memory"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "context_tool",
+      "description": "Gather contextual information for reasoning.",
+      "entry_point": "agent.tools.memory_engine.context_tool",
+      "tags": [
+        "memory",
+        "context"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "memory_management_tool",
+      "description": "Manage stored memories and cleanup policies.",
+      "entry_point": "agent.tools.memory_engine.memory_management_tool",
+      "tags": [
+        "memory"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "planner_tool",
+      "description": "Generate a plan for a goal using the internal planner.",
+      "entry_point": "agent.tools.planning_tools.planner_tool",
+      "tags": [
+        "planning"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "executor_tool",
+      "description": "Execute a lightweight plan and optionally run the evaluator.",
+      "entry_point": "agent.tools.planning_tools.executor_tool",
+      "tags": [
+        "planning",
+        "execution"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    },
+    {
+      "name": "prompt_repository_tool",
+      "description": "Manage prompt templates (list/register/stage/promote/rollback).",
+      "entry_point": "agent.tools.planning_tools.prompt_repository_tool",
+      "tags": [
+        "prompts"
+      ],
+      "enabled": true,
+      "metadata": {
+        "source": "bootstrap"
+      }
+    }
+  ]
+}
