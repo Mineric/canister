@@ -11,7 +11,7 @@ import json
 import tempfile
 import subprocess
 from pathlib import Path
-from typing import Dict, List, Any, Optional
+from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
 
 from .swe_bench_eval import SWEBenchEvaluator, SWEBenchResult
@@ -63,7 +63,7 @@ class SWEBenchHarness:
             shutil.rmtree(self.temp_dir)
             self.temp_dir = None
     
-    def generate_predictions(self) -> Path:
+    def generate_predictions(self) -> Tuple[Path, List[SWEBenchResult]]:
         """Generate predictions using the Canister agent."""
         print("🤖 Generating predictions with Canister agent...")
         
@@ -76,9 +76,14 @@ class SWEBenchHarness:
         results = self.evaluator.evaluate_instances(instances)
         
         # Convert results to SWE-bench prediction format
-        predictions = {}
+        predictions: List[Dict[str, Any]] = []
         for result in results:
-            predictions[result.instance_id] = result.generated_patch
+            predictions.append({
+                "instance_id": result.instance_id,
+                "model_patch": result.generated_patch,
+                "model_confidence": 0.0,
+                "model_thoughts": result.agent_reasoning or "",
+            })
         
         # Save predictions file
         predictions_file = self.temp_dir / "predictions" / "predictions.json"
@@ -86,7 +91,7 @@ class SWEBenchHarness:
             json.dump(predictions, f, indent=2)
             
         print(f"📄 Predictions saved to: {predictions_file}")
-        return predictions_file
+        return predictions_file, results
     
     def run_official_evaluation(self, predictions_file: Path) -> Dict[str, Any]:
         """Run the official SWE-bench evaluation harness."""
@@ -185,14 +190,7 @@ class SWEBenchHarness:
             print(f"Run ID: {self.config.run_id}")
             
             # Step 1: Generate predictions with agent
-            predictions_file = self.generate_predictions()
-            
-            # Get agent results for metrics
-            instances = self.evaluator.load_dataset(
-                self.config.dataset_name,
-                max_instances=self.config.max_instances
-            )
-            agent_results = self.evaluator.evaluate_instances(instances)
+            predictions_file, agent_results = self.generate_predictions()
             
             # Step 2: Run official evaluation
             official_results = self.run_official_evaluation(predictions_file)

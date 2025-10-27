@@ -1,0 +1,42 @@
+{
+  "evaluation_config": {
+    "dataset_name": "princeton-nlp/SWE-bench_Lite",
+    "max_workers": 1,
+    "timeout": 600,
+    "max_instances": 3,
+    "run_id": "canister_agent_lite_3",
+    "use_docker": true,
+    "namespace": ""
+  },
+  "timestamp": "unknown",
+  "agent_results": [
+    {
+      "instance_id": "sample__repo-1",
+      "resolved": false,
+      "generated_patch": "",
+      "execution_time": 0.6692838668823242,
+      "error_message": "Failed to setup repository: Command '['git', 'clone', 'https://github.com/owner/sample-repo.git', '/var/folders/lm/50lm57ds5dj0xv3p0mkf35wh0000gn/T/swe_bench_sample__repo-1_thuh8pmz/repo']' returned non-zero exit status 128.",
+      "agent_reasoning": null
+    }
+  ],
+  "official_evaluation": {
+    "success": false,
+    "error": "<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Users/mineric/Desktop/Scaling Labs/canister/.venv/lib/python3.11/site-packages/swebench/harness/run_evaluation.py\", line 677, in <module>\n    main(**vars(args))\n  File \"/Users/mineric/Desktop/Scaling Labs/canister/.venv/lib/python3.11/site-packages/swebench/harness/run_evaluation.py\", line 514, in main\n    predictions = get_predictions_from_file(predictions_path, dataset_name, split)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/mineric/Desktop/Scaling Labs/canister/.venv/lib/python3.11/site-packages/swebench/harness/utils.py\", line 73, in get_predictions_from_file\n    raise ValueError(f\"Each prediction must be a dictionary, got {type(pred)}\")\nValueError: Each prediction must be a dictionary, got <class 'str'>\n"
+  },
+  "comprehensive_metrics": {
+    "agent_metrics": {
+      "total_instances": 1,
+      "patches_generated": 0,
+      "generation_success_rate": 0.0,
+      "average_generation_time": 0.6692838668823242,
+      "errors": 1
+    }
+  },
+  "summary": {
+    "total_instances": 1,
+    "patches_generated": 0,
+    "generation_success_rate": "0.0%",
+    "official_resolve_rate": "0.0%",
+    "average_time_per_instance": "0.67s"
+  }
+}

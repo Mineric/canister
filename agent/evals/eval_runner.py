@@ -77,16 +77,35 @@ class EvaluationRunner:
         """Run import and dependency evaluation."""
         print("📦 Running Import Evaluation...")
         try:
-            from agent.tests.test_imports import main as run_import_tests
+            import importlib
 
-            # Capture import test results
-            # This would need to be modified to return results instead of printing
-            self.results["imports"] = {"status": "completed"}
+            modules_to_check = [
+                "agent.agent",
+                "agent.tools.tools",
+                "agent.core.structure_index",
+                "agent.core.planner",
+                "agent.core.executor",
+            ]
 
+            failures = []
+            for module_name in modules_to_check:
+                try:
+                    importlib.import_module(module_name)
+                except Exception as exc:  # pragma: no cover - diagnostics only
+                    failures.append({"module": module_name, "error": str(exc)})
+
+            if failures:
+                print("❌ Import evaluation detected failures:")
+                for failure in failures:
+                    print(f"   - {failure['module']}: {failure['error']}")
+                self.results["imports"] = {"failures": failures}
+                return False
+
+            self.results["imports"] = {"status": "completed", "checked_modules": modules_to_check}
             print("✅ Import evaluation completed")
             return True
 
-        except Exception as e:
+        except Exception as e:  # pragma: no cover - unexpected
             print(f"❌ Import evaluation failed: {e}")
             self.results["imports"] = {"error": str(e)}
             return False
@@ -95,8 +114,8 @@ class EvaluationRunner:
         """Run SWE-bench evaluation."""
         print("🎯 Running SWE-bench Evaluation...")
         try:
-            from .swe_bench_eval import SWEBenchEvaluator
-            from .swe_bench_config import create_evaluation_config
+            from agent.evals.swe_bench_eval import SWEBenchEvaluator
+            from agent.evals.swe_bench_config import create_evaluation_config
 
             # Create a quick test configuration
             config = create_evaluation_config(

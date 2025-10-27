@@ -9,10 +9,13 @@ the agent's software engineering capabilities on real-world GitHub issues.
 import os
 import json
 import time
+import uuid
 import tempfile
 import subprocess
+import asyncio
+import threading
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Callable, Coroutine
 from dataclasses import dataclass, asdict
 # Optional datasets import with graceful fallback
 try:
@@ -31,6 +34,18 @@ except ImportError:
     # Fallback for when agent is not available
     def get_agent():
         return MockAgent()
+
+
+# Optional Google ADK imports for direct agent execution
+try:
+    from google.adk.runners import Runner, types as runner_types
+    from google.adk.sessions import InMemorySessionService
+    from google.adk.memory import InMemoryMemoryService
+except Exception:  # pragma: no cover - available when ADK is installed
+    Runner = None
+    runner_types = None
+    InMemorySessionService = None
+    InMemoryMemoryService = None
 
 
 class MockAgent:
@@ -57,6 +72,146 @@ class MockAgent:
     def tools(self):
         """Mock tools property."""
         return []
+
+
+class AgentRunnerAdapter:
+    """Adapter that provides a uniform run() API for different agent types."""
+
+    def __init__(self, agent: Any):
+        self.agent = agent
+        self._runner = None
+        self._runner_types = None
+        self._session_service = None
+        self._memory_service = None
+
+        if Runner and InMemorySessionService:
+            try:
+                self._session_service = InMemorySessionService()
+                self._memory_service = (
+                    InMemoryMemoryService() if InMemoryMemoryService else None
+                )
+                self._runner = Runner(
+                    app_name="canister_swe_bench",
+                    agent=self.agent,
+                    session_service=self._session_service,
+                    memory_service=self._memory_service,
+                )
+                self._runner_types = runner_types
+            except Exception:
+                self._runner = None
+                self._runner_types = None
+
+    def run(self, prompt: str) -> str:
+        """Execute the agent with the provided prompt and return text output."""
+
+        # Prefer a direct run() method if available (e.g., MockAgent or custom wrappers)
+        run_callable = getattr(self.agent, "run", None)
+        if callable(run_callable):
+            try:
+                response = run_callable(prompt)
+            except (TypeError, AttributeError):
+                response = None
+            if isinstance(response, str):
+                return response
+            if response is not None:
+                extracted = self._extract_text_from_response(response)
+                if extracted:
+                    return extracted
+
+        # Fallback to Google ADK runner when possible
+        if self._runner and self._runner_types:
+            return self._run_with_adk_runner(prompt)
+
+        raise RuntimeError("Agent does not support direct execution")
+
+    def _run_with_adk_runner(self, prompt: str) -> str:
+        user_id = "swe_bench"
+        session = self._session_service.create_session_sync(
+            app_name=self._runner.app_name,
+            user_id=user_id,
+        )
+        session_id = session.id
+
+        message = self._runner_types.Content(
+            role="user",
+            parts=[self._runner_types.Part(text=prompt)],
+        )
+
+        async def _collect_runner_output() -> str:
+            chunks: List[str] = []
+            try:
+                async for event in self._runner.run_async(
+                    user_id=user_id,
+                    session_id=session_id,
+                    new_message=message,
+                ):
+                    content = getattr(event, "content", None)
+                    if content and content.parts:
+                        for part in content.parts:
+                            if part.text:
+                                chunks.append(part.text)
+            finally:
+                self._runner.session_service.delete_session_sync(
+                    app_name=self._runner.app_name,
+                    user_id=user_id,
+                    session_id=session_id,
+                )
+
+            return "\n".join(chunks)
+
+        return self._run_coroutine_sync(_collect_runner_output)
+
+    @staticmethod
+    def _run_coroutine_sync(
+        coroutine_factory: Callable[[], Coroutine[Any, Any, str]]
+    ) -> str:
+        """
+        Execute an async coroutine in synchronous contexts.
+
+        Uses asyncio.run() when possible and falls back to a dedicated
+        event loop on a worker thread when already inside a running loop.
+        """
+
+        try:
+            return asyncio.run(coroutine_factory())
+        except RuntimeError as exc:
+            # Happens when we're already inside an event loop (e.g. notebooks)
+            if "asyncio.run() cannot be called from a running event loop" not in str(exc):
+                raise
+
+        result_holder: Dict[str, Any] = {}
+        error_holder: List[BaseException] = []
+
+        def _runner() -> None:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                result_holder["value"] = loop.run_until_complete(coroutine_factory())
+            except BaseException as err:
+                error_holder.append(err)
+            finally:
+                loop.close()
+                asyncio.set_event_loop(None)
+
+        thread = threading.Thread(target=_runner, daemon=True)
+        thread.start()
+        thread.join()
+
+        if error_holder:
+            raise error_holder[0]
+
+        return result_holder.get("value", "")
+
+    @staticmethod
+    def _extract_text_from_response(response: Any) -> str:
+        content = getattr(response, "content", None)
+        if content and getattr(content, "parts", None):
+            texts = [getattr(part, "text", "") for part in content.parts if getattr(part, "text", None)]
+            if texts:
+                return "\n".join(texts)
+        if isinstance(response, dict) and response.get("content"):
+            return str(response["content"])
+        return ""
 
 
 @dataclass
@@ -107,6 +262,7 @@ class SWEBenchAgentInterface:
         """Initialize the interface with an agent instance."""
         self.agent = agent or get_agent()
         self.temp_dir = None
+        self._adapter = AgentRunnerAdapter(self.agent)
         
     def setup_workspace(self, instance: SWEBenchInstance) -> Path:
         """Set up a temporary workspace for the SWE-bench instance."""
@@ -222,8 +378,8 @@ Focus on creating a minimal, targeted fix that addresses the core issue.
             problem_text = self.format_problem_for_agent(instance, repo_path)
             
             # Get agent response
-            response = self.agent.run(problem_text)
-            
+            response = self._adapter.run(problem_text)
+
             # Extract patch from response
             generated_patch = self.extract_patch_from_response(response)
             
