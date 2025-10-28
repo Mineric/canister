@@ -8,7 +8,8 @@ points; actual tool invocation logic can be layered on incrementally.
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+import json
+from dataclasses import dataclass, field, asdict
 from typing import Any, Callable, Dict, Optional
 
 from agent.core.telemetry import get_telemetry
@@ -192,7 +193,8 @@ class Executor:
         data = {
             eval_key: {
                 "success": report.success,
-                "details": report.details,
+                "summary": report.summary,
+                "findings": [asdict(finding) for finding in report.findings],
             }
         }
 
@@ -220,7 +222,10 @@ class Executor:
         promoted = self.prompt_repository.promote_prompt(
             prompt_id,
             version_id,
-            evaluation_report=evaluation.get("details"),
+            evaluation_report={
+                "summary": json.dumps(evaluation.get("summary", {})),
+                "findings": json.dumps(evaluation.get("findings", [])),
+            },
         )
 
         return ExecutionResult(

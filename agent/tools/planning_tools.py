@@ -120,9 +120,22 @@ def executor_tool() -> FunctionTool:
                 if key.startswith("prompt_eval:"):
                     prompt_id = key.split(":", 1)[1]
                     evaluation = value
-                    lines.append(
-                        f"   - Evaluation {prompt_id}: {'pass' if evaluation.get('success') else 'fail'}"
-                    )
+                    passed = evaluation.get("success")
+                    lines.append(f"   - Evaluation {prompt_id}: {'pass' if passed else 'fail'}")
+                    summary = evaluation.get("summary") or {}
+                    if summary:
+                        summary_line = ", ".join(
+                            f"{k}={v}" for k, v in summary.items()
+                        )
+                        lines.append(f"     • Summary: {summary_line}")
+                    findings = evaluation.get("findings") or []
+                    for finding in findings[:3]:
+                        severity = finding.get("severity", "info").upper()
+                        code = finding.get("code", "unknown")
+                        message = finding.get("message", "")
+                        lines.append(f"     • {severity} {code}: {message}")
+                    if len(findings) > 3:
+                        lines.append(f"     • (+{len(findings) - 3} more findings)")
                 if key.startswith("prompt_active:"):
                     prompt_id = key.split(":", 1)[1]
                     lines.append(f"   - Active version for {prompt_id}: {value}")

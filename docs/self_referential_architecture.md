@@ -94,8 +94,8 @@ Telemetry captures activity across services, knowledge stores feed the planner, 
 - **Key Modules**: `agent/core/prompt_repository.py`.
 - **Implementation Tasks**
   - Define prompt metadata schema (id, version, owning capability, evaluation history, usage metrics). ✅ (implemented in repository.)
-  - Add planner/executor flows for prompt improvements (draft -> evaluate -> stage -> release) with telemetry and rollback. (Tool scaffolding added; planner/executor integration pending.)
-  - Integrate evaluator with prompt-specific suites (scenario replays, A/B tests, hallucination checks).
+  - Add planner/executor flows for prompt improvements (draft -> evaluate -> stage -> release) with telemetry and rollback. ✅ (planner + executor now manage stage/evaluate/promote with telemetry.)
+  - Integrate evaluator with prompt-specific suites (scenario replays, A/B tests, hallucination checks). 🔄 Structural + quality heuristics implemented; behavioural suites remain TODO.
   - Emit telemetry per prompt version and maintain policy rules for promotion/demotion.
 
 ## 6. Planner
