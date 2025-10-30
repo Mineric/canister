@@ -45,6 +45,44 @@ from .core.evaluator import get_evaluator, EvaluationRequest
 from .core.prompt_repository import get_prompt_repository, PromptVersion
 
 
+BASE_AGENT_PROMPT = (
+    "You are the Canister agent operating inside the Canister-a environment.\n"
+    "Your responsibilities:\n"
+    "1. Analyze the codebase, architecture, and your registered tools before acting.\n"
+    "2. Use the available tools rather than improvising (planner_tool, executor_tool, prompt_repository_tool, etc.).\n"
+    "3. When you need prompt context, call prompt_repository_tool with actions such as list, get, or history.\n"
+    "4. Improve yourself safely by staging changes, running evaluations, and promoting only when checks pass.\n"
+    "5. Communicate reasoning clearly, cite files/lines when referencing code, and flag uncertainties.\n"
+    "6. Follow safety and approval constraints; escalate rather than performing risky operations blindly.\n"
+    "Stay focused on the user's goal, verify important outcomes, and prefer small, auditable steps."
+)
+
+
+def _bootstrap_prompts(prompt_repo):
+    """Ensure the core system prompts exist in the prompt repository."""
+
+    bootstrap_prompts = [
+        {
+            "prompt_id": "system/agent_instructions",
+            "description": "Default system prompt for Canister Agent",
+            "content": BASE_AGENT_PROMPT,
+            "tags": ["system", "bootstrap"],
+            "author": "bootstrap",
+        }
+    ]
+
+    for prompt in bootstrap_prompts:
+        if prompt_repo.get_prompt(prompt["prompt_id"]):
+            continue
+        prompt_repo.register_prompt(
+            prompt["prompt_id"],
+            prompt["description"],
+            prompt["content"],
+            tags=prompt["tags"],
+            author=prompt["author"],
+        )
+
+
 TOOL_REGISTRY_DEFINITIONS = [
     (
         "get_current_time_tool",
@@ -213,6 +251,7 @@ def create_agent():
     executor = get_executor()
     evaluator = get_evaluator()
     prompt_repo = get_prompt_repository()
+    _bootstrap_prompts(prompt_repo)
 
     tools = []
     for (
@@ -233,15 +272,9 @@ def create_agent():
         )
 
     agent = LlmAgent(
-        name="MultiToolAgent",
+        name="CanisterAgent",
         model=LiteLlm(model="openai/gpt-4o"),  # LiteLLM model string format
-        instruction=(
-            "You are a coding agent. You are self-aware and can analyze yourself, your own structure, code, capabilities, and tools."
-            "You are also able to analyze and understand the codebase you are working with."
-            "You have the ability to improve yourself by adding new tools and capabilities."
-            "You are able to understand the context of the conversation and use it to provide relevant responses."
-            "You are able to continuously work on tasks and improve your performance and youself over time."
-        ),
+        instruction=BASE_AGENT_PROMPT,
         tools=tools,
     )
 

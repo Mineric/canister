@@ -96,6 +96,8 @@ Telemetry captures activity across services, knowledge stores feed the planner, 
   - Define prompt metadata schema (id, version, owning capability, evaluation history, usage metrics). ✅ (implemented in repository.)
   - Add planner/executor flows for prompt improvements (draft -> evaluate -> stage -> release) with telemetry and rollback. ✅ (planner + executor now manage stage/evaluate/promote with telemetry.)
   - Integrate evaluator with prompt-specific suites (scenario replays, A/B tests, hallucination checks). 🔄 Structural + quality heuristics implemented; behavioural suites remain TODO.
+  - Expose prompt retrieval/history (`get`, `history`) through the prompt repository ADK tool so the agent can inspect stored templates directly. ✅ (`agent/tools/planning_tools.py`)
+  - Bootstrap default system prompt content during agent startup so prompt operations have an initial target. ✅ (`agent/agent.py`)
   - Emit telemetry per prompt version and maintain policy rules for promotion/demotion.
 
 ## 6. Planner

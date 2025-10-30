@@ -17,7 +17,7 @@
   ],
   "timestamp": "2025-10-27 23:24:07",
   "agent_config": {
-    "agent_name": "Canister Agent",
+    "agent_name": "CanisterAgent",
     "model": "gpt-4o",
     "tools_count": 22
   }

@@ -170,7 +170,7 @@ def prompt_repository_tool() -> FunctionTool:
 
     def manage_prompt(
         action: str,
-        prompt_id: str,
+        prompt_id: str = "",
         description: str = "",
         content: str = "",
         tags: str = "",
@@ -195,6 +195,8 @@ def prompt_repository_tool() -> FunctionTool:
                 return "\n".join(lines) if records else "Prompt repository is empty."
 
             if action == "register":
+                if not prompt_id:
+                    return "Error: prompt_id is required for register."
                 if not content:
                     return "Error: content is required for register." 
                 version = repo.register_prompt(
@@ -212,6 +214,8 @@ def prompt_repository_tool() -> FunctionTool:
                 return f"Registered prompt {prompt_id} (version {version.version_id})."
 
             if action == "stage":
+                if not prompt_id:
+                    return "Error: prompt_id is required for stage."
                 if not content:
                     return "Error: content is required for stage."
                 version = repo.stage_prompt(
@@ -226,7 +230,94 @@ def prompt_repository_tool() -> FunctionTool:
                 )
                 return f"Staged new version {version.version_id} for {prompt_id}."
 
+            if action == "get":
+                if not prompt_id:
+                    return "Error: prompt_id is required for get."
+                record = repo.get_prompt(prompt_id)
+                if not record:
+                    return f"Prompt not found: {prompt_id}"
+
+                target_version = None
+                if version_id:
+                    for version in record.versions:
+                        if version.version_id == version_id:
+                            target_version = version
+                            break
+                    if target_version is None:
+                        return f"Version {version_id} not found for {prompt_id}."
+                else:
+                    target_version = repo.get_active_version(prompt_id)
+                    if target_version is None:
+                        return f"No active version found for {prompt_id}."
+
+                telemetry.log_event(
+                    "prompt_tool.get",
+                    prompt_id=prompt_id,
+                    version_id=target_version.version_id,
+                )
+
+                lines = [
+                    f"📝 Prompt {prompt_id}",
+                    f"Version: {target_version.version_id}",
+                    f"Status: {target_version.status}",
+                    f"Author: {target_version.author or '<unknown>'}",
+                    f"Created: {target_version.created_at}",
+                ]
+                if target_version.metadata:
+                    metadata_summary = ", ".join(
+                        f"{k}={v}" for k, v in target_version.metadata.items()
+                    )
+                    lines.append(f"Metadata: {metadata_summary}")
+                if target_version.evaluation_report:
+                    eval_summary = target_version.evaluation_report.get("summary")
+                    if isinstance(eval_summary, dict):
+                        eval_summary = ", ".join(
+                            f"{k}={v}" for k, v in eval_summary.items()
+                        )
+                    lines.append(f"Evaluation: {eval_summary or target_version.evaluation_report}")
+                lines.append("")
+                lines.append("Content:")
+                lines.append(target_version.content)
+
+                return "\n".join(lines)
+
+            if action == "history":
+                if not prompt_id:
+                    return "Error: prompt_id is required for history."
+                record = repo.get_prompt(prompt_id)
+                if not record:
+                    return f"Prompt not found: {prompt_id}"
+
+                telemetry.log_event(
+                    "prompt_tool.history",
+                    prompt_id=prompt_id,
+                    versions=len(record.versions),
+                )
+
+                lines = [f"📜 History for {prompt_id}"]
+                for version in record.versions:
+                    lines.append(
+                        f"- {version.status.upper()} {version.version_id} ({version.created_at})"
+                    )
+                    author = version.author or "<unknown>"
+                    lines.append(f"  Author: {author}")
+                    if version.metadata:
+                        metadata_summary = ", ".join(
+                            f"{k}={v}" for k, v in version.metadata.items()
+                        )
+                        lines.append(f"  Metadata: {metadata_summary}")
+                    if version.evaluation_report:
+                        summary = version.evaluation_report.get("summary")
+                        if isinstance(summary, dict):
+                            summary = ", ".join(
+                                f"{k}={v}" for k, v in summary.items()
+                            )
+                        lines.append(f"  Evaluation: {summary or version.evaluation_report}")
+                return "\n".join(lines)
+
             if action == "promote":
+                if not prompt_id:
+                    return "Error: prompt_id is required for promote."
                 if not version_id:
                     return "Error: version_id is required for promote."
                 version = repo.promote_prompt(prompt_id, version_id)
@@ -238,6 +329,8 @@ def prompt_repository_tool() -> FunctionTool:
                 return f"Promoted version {version.version_id} for {prompt_id}."
 
             if action == "rollback":
+                if not prompt_id:
+                    return "Error: prompt_id is required for rollback."
                 version = repo.rollback_prompt(prompt_id)
                 if version:
                     telemetry.log_event(
@@ -248,7 +341,7 @@ def prompt_repository_tool() -> FunctionTool:
                     return f"Rolled back {prompt_id} to version {version.version_id}."
                 return f"No rollback performed for {prompt_id}."
 
-            return "Error: Unknown action. Use list, register, stage, promote, rollback."
+            return "Error: Unknown action. Use list, register, stage, get, history, promote, rollback."
         except Exception as exc:  # pragma: no cover - safety net
             telemetry.log_event(
                 "prompt_tool.error",
