@@ -59,6 +59,7 @@ Telemetry captures activity across services, knowledge stores feed the planner, 
   - Define `TelemetryEvent` dataclass (timestamp, event_type, payload).
   - Provide `TelemetryClient.log_event()` and `TelemetryClient.flush()`. ✅ (`agent/core/telemetry.py`)
   - Instrument existing tools (indexer, mergers, memory engine) to emit events at start/finish/error. ✅ (`StructureIndex`, `MemoryEngine`, and `ProfessionalSWEMerger` now emit detailed telemetry.)
+  - Record LLM request/usage metrics (token counts, stream flag) through a LiteLLM wrapper. ✅ (`agent/core/llm_instrumentation.py`)
   - Add configuration for sinks (file, stdout, future metrics backend).
 
 ## 2. Capability Registry

@@ -1,5 +1,4 @@
 from google.adk.agents import LlmAgent
-from google.adk.models.lite_llm import LiteLlm
 from google.adk.sessions import InMemorySessionService, VertexAiSessionService
 from google.adk.memory import InMemoryMemoryService, VertexAiRagMemoryService
 from google.adk.runners import Runner
@@ -37,6 +36,7 @@ from .tools.planning_tools import (
     executor_tool,
     prompt_repository_tool,
 )
+from .core.llm_instrumentation import TelemetryLiteLlm
 from .core.telemetry import get_telemetry
 from .core.capabilities import get_capability_registry
 from .core.planner import get_planner
@@ -273,7 +273,7 @@ def create_agent():
 
     agent = LlmAgent(
         name="CanisterAgent",
-        model=LiteLlm(model="openai/gpt-4o"),  # LiteLLM model string format
+        model=TelemetryLiteLlm(model="openai/gpt-4o"),
         instruction=BASE_AGENT_PROMPT,
         tools=tools,
     )
