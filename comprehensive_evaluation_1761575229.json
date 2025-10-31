@@ -1,0 +1,145 @@
+{
+  "timestamp": 1761575229.583004,
+  "duration": 4.0666279792785645,
+  "evaluations": {
+    "performance": {
+      "timestamp": 1761575229.257287,
+      "total_evaluations": 2,
+      "evaluations": [
+        {
+          "test_name": "calculator_performance",
+          "success": true,
+          "duration": 0.00011181831359863281,
+          "metrics": [
+            {
+              "name": "average_duration",
+              "value": 3.85284423828125e-06,
+              "unit": "seconds",
+              "description": "Average execution time",
+              "timestamp": 1761575229.2572002
+            },
+            {
+              "name": "median_duration",
+              "value": 3.0994415283203125e-06,
+              "unit": "seconds",
+              "description": "Median execution time",
+              "timestamp": 1761575229.257205
+            },
+            {
+              "name": "success_rate",
+              "value": 1.0,
+              "unit": "ratio",
+              "description": "Success rate (0-1)",
+              "timestamp": 1761575229.257205
+            },
+            {
+              "name": "throughput",
+              "value": 223576.97228144988,
+              "unit": "operations/second",
+              "description": "Operations per second",
+              "timestamp": 1761575229.257206
+            }
+          ],
+          "error_message": ""
+        },
+        {
+          "test_name": "text_analyzer_performance",
+          "success": true,
+          "duration": 4.363059997558594e-05,
+          "metrics": [
+            {
+              "name": "average_duration",
+              "value": 1.895427703857422e-06,
+              "unit": "seconds",
+              "description": "Average execution time",
+              "timestamp": 1761575229.257283
+            },
+            {
+              "name": "median_duration",
+              "value": 1.7881393432617188e-06,
+              "unit": "seconds",
+              "description": "Median execution time",
+              "timestamp": 1761575229.257285
+            },
+            {
+              "name": "success_rate",
+              "value": 1.0,
+              "unit": "ratio",
+              "description": "Success rate (0-1)",
+              "timestamp": 1761575229.257285
+            },
+            {
+              "name": "throughput",
+              "value": 458393.87978142075,
+              "unit": "operations/second",
+              "description": "Operations per second",
+              "timestamp": 1761575229.257285
+            }
+          ],
+          "error_message": ""
+        }
+      ],
+      "summary": {
+        "overall_success_rate": 1.0,
+        "average_execution_time": 2.874135971069336e-06,
+        "total_duration": 0.00015544891357421875
+      }
+    },
+    "code_quality": {
+      "metrics": {
+        "files_analyzed": 36,
+        "total_lines": 11900,
+        "total_functions": 388,
+        "total_classes": 74,
+        "syntax_errors": 0,
+        "avg_complexity": 32.47222222222222,
+        "avg_docstring_coverage": 0.8071082118489239
+      },
+      "assessment": {
+        "timestamp": 1761575229.58256,
+        "metrics": [
+          {
+            "name": "complexity",
+            "value": 32.47222222222222,
+            "max_value": 10,
+            "description": "Average cyclomatic complexity (lower is better)",
+            "passed": false
+          },
+          {
+            "name": "docstring_coverage",
+            "value": 0.8071082118489239,
+            "max_value": 1.0,
+            "description": "Docstring coverage percentage",
+            "passed": true
+          },
+          {
+            "name": "syntax_validity",
+            "value": 1.0,
+            "max_value": 1.0,
+            "description": "Syntax validity rate",
+            "passed": true
+          }
+        ],
+        "summary": {
+          "total_metrics": 3,
+          "passed_metrics": 2,
+          "quality_score": 0.6666666666666666,
+          "overall_quality": "Medium"
+        }
+      }
+    },
+    "imports": {
+      "error": "No module named 'agent.tests.test_imports'"
+    },
+    "swe_bench": {
+      "error": "attempted relative import with no known parent package"
+    }
+  },
+  "summary": {
+    "performance_score": 1.0,
+    "quality_score": 0.6666666666666666,
+    "import_score": 0,
+    "overall_score": 0.5555555555555555,
+    "grade": "F"
+  }
+}

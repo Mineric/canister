@@ -1,0 +1,24 @@
+{
+  "dataset_name": "princeton-nlp/SWE-bench_Lite",
+  "total_instances": 1,
+  "resolved_count": 0,
+  "resolve_rate": 0.0,
+  "total_time": 0.8192870616912842,
+  "average_time_per_instance": 0.8192870616912842,
+  "results": [
+    {
+      "instance_id": "sample__repo-1",
+      "resolved": false,
+      "generated_patch": "",
+      "execution_time": 0.8185398578643799,
+      "error_message": "Failed to setup repository: Command '['git', 'clone', 'https://github.com/owner/sample-repo.git', '/var/folders/lm/50lm57ds5dj0xv3p0mkf35wh0000gn/T/swe_bench_sample__repo-1_jbx5ruwf/repo']' returned non-zero exit status 128.",
+      "agent_reasoning": null
+    }
+  ],
+  "timestamp": "2025-10-27 23:24:07",
+  "agent_config": {
+    "agent_name": "CanisterAgent",
+    "model": "gpt-4o",
+    "tools_count": 22
+  }
+}

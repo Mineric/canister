@@ -1,0 +1,58 @@
+{
+  "evaluation_config": {
+    "dataset_name": "princeton-nlp/SWE-bench_Lite",
+    "max_workers": 1,
+    "timeout": 600,
+    "max_instances": 3,
+    "run_id": "canister_agent_lite_3",
+    "use_docker": true,
+    "namespace": ""
+  },
+  "timestamp": "unknown",
+  "agent_results": [
+    {
+      "instance_id": "astropy__astropy-12907",
+      "resolved": false,
+      "generated_patch": "",
+      "execution_time": 55.52448511123657,
+      "error_message": "'LlmAgent' object has no attribute 'run'",
+      "agent_reasoning": null
+    },
+    {
+      "instance_id": "astropy__astropy-14182",
+      "resolved": false,
+      "generated_patch": "",
+      "execution_time": 72.078928232193,
+      "error_message": "'LlmAgent' object has no attribute 'run'",
+      "agent_reasoning": null
+    },
+    {
+      "instance_id": "astropy__astropy-14365",
+      "resolved": false,
+      "generated_patch": "",
+      "execution_time": 52.58785390853882,
+      "error_message": "'LlmAgent' object has no attribute 'run'",
+      "agent_reasoning": null
+    }
+  ],
+  "official_evaluation": {
+    "success": false,
+    "error": "<frozen runpy>:128: RuntimeWarning: 'swebench.harness.run_evaluation' found in sys.modules after import of package 'swebench.harness', but prior to execution of 'swebench.harness.run_evaluation'; this may result in unpredictable behaviour\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"/Users/mineric/Desktop/Scaling Labs/canister/.venv/lib/python3.11/site-packages/swebench/harness/run_evaluation.py\", line 677, in <module>\n    main(**vars(args))\n  File \"/Users/mineric/Desktop/Scaling Labs/canister/.venv/lib/python3.11/site-packages/swebench/harness/run_evaluation.py\", line 514, in main\n    predictions = get_predictions_from_file(predictions_path, dataset_name, split)\n                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/Users/mineric/Desktop/Scaling Labs/canister/.venv/lib/python3.11/site-packages/swebench/harness/utils.py\", line 73, in get_predictions_from_file\n    raise ValueError(f\"Each prediction must be a dictionary, got {type(pred)}\")\nValueError: Each prediction must be a dictionary, got <class 'str'>\n"
+  },
+  "comprehensive_metrics": {
+    "agent_metrics": {
+      "total_instances": 3,
+      "patches_generated": 0,
+      "generation_success_rate": 0.0,
+      "average_generation_time": 60.06375575065613,
+      "errors": 3
+    }
+  },
+  "summary": {
+    "total_instances": 3,
+    "patches_generated": 0,
+    "generation_success_rate": "0.0%",
+    "official_resolve_rate": "0.0%",
+    "average_time_per_instance": "60.06s"
+  }
+}

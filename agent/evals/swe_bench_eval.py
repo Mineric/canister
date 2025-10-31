@@ -9,12 +9,19 @@ the agent's software engineering capabilities on real-world GitHub issues.
 import os
 import json
 import time
+import uuid
 import tempfile
 import subprocess
+import asyncio
+import threading
 from pathlib import Path
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Callable, Coroutine
 from dataclasses import dataclass, asdict
-from datasets import load_dataset
+# Optional datasets import with graceful fallback
+try:
+    from datasets import load_dataset  # type: ignore
+except Exception:  # pragma: no cover - handled at runtime
+    load_dataset = None  # type: ignore
 
 # Add project root to path for imports
 import sys
@@ -27,6 +34,18 @@ except ImportError:
     # Fallback for when agent is not available
     def get_agent():
         return MockAgent()
+
+
+# Optional Google ADK imports for direct agent execution
+try:
+    from google.adk.runners import Runner, types as runner_types
+    from google.adk.sessions import InMemorySessionService
+    from google.adk.memory import InMemoryMemoryService
+except Exception:  # pragma: no cover - available when ADK is installed
+    Runner = None
+    runner_types = None
+    InMemorySessionService = None
+    InMemoryMemoryService = None
 
 
 class MockAgent:
@@ -53,6 +72,146 @@ class MockAgent:
     def tools(self):
         """Mock tools property."""
         return []
+
+
+class AgentRunnerAdapter:
+    """Adapter that provides a uniform run() API for different agent types."""
+
+    def __init__(self, agent: Any):
+        self.agent = agent
+        self._runner = None
+        self._runner_types = None
+        self._session_service = None
+        self._memory_service = None
+
+        if Runner and InMemorySessionService:
+            try:
+                self._session_service = InMemorySessionService()
+                self._memory_service = (
+                    InMemoryMemoryService() if InMemoryMemoryService else None
+                )
+                self._runner = Runner(
+                    app_name="canister_swe_bench",
+                    agent=self.agent,
+                    session_service=self._session_service,
+                    memory_service=self._memory_service,
+                )
+                self._runner_types = runner_types
+            except Exception:
+                self._runner = None
+                self._runner_types = None
+
+    def run(self, prompt: str) -> str:
+        """Execute the agent with the provided prompt and return text output."""
+
+        # Prefer a direct run() method if available (e.g., MockAgent or custom wrappers)
+        run_callable = getattr(self.agent, "run", None)
+        if callable(run_callable):
+            try:
+                response = run_callable(prompt)
+            except (TypeError, AttributeError):
+                response = None
+            if isinstance(response, str):
+                return response
+            if response is not None:
+                extracted = self._extract_text_from_response(response)
+                if extracted:
+                    return extracted
+
+        # Fallback to Google ADK runner when possible
+        if self._runner and self._runner_types:
+            return self._run_with_adk_runner(prompt)
+
+        raise RuntimeError("Agent does not support direct execution")
+
+    def _run_with_adk_runner(self, prompt: str) -> str:
+        user_id = "swe_bench"
+        session = self._session_service.create_session_sync(
+            app_name=self._runner.app_name,
+            user_id=user_id,
+        )
+        session_id = session.id
+
+        message = self._runner_types.Content(
+            role="user",
+            parts=[self._runner_types.Part(text=prompt)],
+        )
+
+        async def _collect_runner_output() -> str:
+            chunks: List[str] = []
+            try:
+                async for event in self._runner.run_async(
+                    user_id=user_id,
+                    session_id=session_id,
+                    new_message=message,
+                ):
+                    content = getattr(event, "content", None)
+                    if content and content.parts:
+                        for part in content.parts:
+                            if part.text:
+                                chunks.append(part.text)
+            finally:
+                self._runner.session_service.delete_session_sync(
+                    app_name=self._runner.app_name,
+                    user_id=user_id,
+                    session_id=session_id,
+                )
+
+            return "\n".join(chunks)
+
+        return self._run_coroutine_sync(_collect_runner_output)
+
+    @staticmethod
+    def _run_coroutine_sync(
+        coroutine_factory: Callable[[], Coroutine[Any, Any, str]]
+    ) -> str:
+        """
+        Execute an async coroutine in synchronous contexts.
+
+        Uses asyncio.run() when possible and falls back to a dedicated
+        event loop on a worker thread when already inside a running loop.
+        """
+
+        try:
+            return asyncio.run(coroutine_factory())
+        except RuntimeError as exc:
+            # Happens when we're already inside an event loop (e.g. notebooks)
+            if "asyncio.run() cannot be called from a running event loop" not in str(exc):
+                raise
+
+        result_holder: Dict[str, Any] = {}
+        error_holder: List[BaseException] = []
+
+        def _runner() -> None:
+            loop = asyncio.new_event_loop()
+            asyncio.set_event_loop(loop)
+            try:
+                result_holder["value"] = loop.run_until_complete(coroutine_factory())
+            except BaseException as err:
+                error_holder.append(err)
+            finally:
+                loop.close()
+                asyncio.set_event_loop(None)
+
+        thread = threading.Thread(target=_runner, daemon=True)
+        thread.start()
+        thread.join()
+
+        if error_holder:
+            raise error_holder[0]
+
+        return result_holder.get("value", "")
+
+    @staticmethod
+    def _extract_text_from_response(response: Any) -> str:
+        content = getattr(response, "content", None)
+        if content and getattr(content, "parts", None):
+            texts = [getattr(part, "text", "") for part in content.parts if getattr(part, "text", None)]
+            if texts:
+                return "\n".join(texts)
+        if isinstance(response, dict) and response.get("content"):
+            return str(response["content"])
+        return ""
 
 
 @dataclass
@@ -103,6 +262,7 @@ class SWEBenchAgentInterface:
         """Initialize the interface with an agent instance."""
         self.agent = agent or get_agent()
         self.temp_dir = None
+        self._adapter = AgentRunnerAdapter(self.agent)
         
     def setup_workspace(self, instance: SWEBenchInstance) -> Path:
         """Set up a temporary workspace for the SWE-bench instance."""
@@ -218,8 +378,8 @@ Focus on creating a minimal, targeted fix that addresses the core issue.
             problem_text = self.format_problem_for_agent(instance, repo_path)
             
             # Get agent response
-            response = self.agent.run(problem_text)
-            
+            response = self._adapter.run(problem_text)
+
             # Extract patch from response
             generated_patch = self.extract_patch_from_response(response)
             
@@ -253,34 +413,83 @@ class SWEBenchEvaluator:
         """Initialize evaluator with agent."""
         self.agent_interface = SWEBenchAgentInterface(agent)
         
-    def load_dataset(self, dataset_name: str = "princeton-nlp/SWE-bench_Lite", 
-                    split: str = "test", max_instances: Optional[int] = None) -> List[SWEBenchInstance]:
-        """Load SWE-bench dataset instances."""
+    def load_dataset(
+        self,
+        dataset_name: str = "princeton-nlp/SWE-bench_Lite",
+        split: str = "test",
+        max_instances: Optional[int] = None,
+        local_path: Optional[str] = None,
+    ) -> List[SWEBenchInstance]:
+        """Load SWE-bench dataset instances, with optional local fallback."""
+
+        env_local_path = os.getenv("SWE_BENCH_DATASET_PATH")
+        local_path = local_path or env_local_path
+        if local_path:
+            print(f"Loading SWE-bench instances from local path: {local_path}")
+            return self._load_local_dataset(local_path, max_instances=max_instances)
+
         print(f"Loading dataset: {dataset_name}")
-        
-        dataset = load_dataset(dataset_name, split=split)
-        
-        instances = []
+
+        if load_dataset is None:
+            raise RuntimeError(
+                "datasets library not available. Supply local_path or install datasets."
+            )
+
+        try:
+            dataset = load_dataset(dataset_name, split=split)
+        except Exception as exc:
+            raise RuntimeError(
+                f"Failed to load dataset '{dataset_name}'. Provide local_path or ensure datasets is configured."
+            ) from exc
+
+        instances: List[SWEBenchInstance] = []
         for i, item in enumerate(dataset):
             if max_instances and i >= max_instances:
                 break
-                
-            instance = SWEBenchInstance(
-                instance_id=item['instance_id'],
-                repo=item['repo'],
-                base_commit=item['base_commit'],
-                patch=item['patch'],
-                test_patch=item['test_patch'],
-                problem_statement=item['problem_statement'],
-                hints_text=item.get('hints_text', ''),
-                created_at=item['created_at'],
-                version=item['version'],
-                FAIL_TO_PASS=item['FAIL_TO_PASS'],
-                PASS_TO_PASS=item['PASS_TO_PASS']
-            )
-            instances.append(instance)
-            
+            instances.append(self._convert_item_to_instance(item))
+
         print(f"Loaded {len(instances)} instances")
+        return instances
+
+    # ------------------------------------------------------------------
+    # Dataset helpers
+    # ------------------------------------------------------------------
+
+    def _convert_item_to_instance(self, item: Dict[str, Any]) -> SWEBenchInstance:
+        return SWEBenchInstance(
+            instance_id=item["instance_id"],
+            repo=item["repo"],
+            base_commit=item["base_commit"],
+            patch=item["patch"],
+            test_patch=item.get("test_patch", ""),
+            problem_statement=item["problem_statement"],
+            hints_text=item.get("hints_text", ""),
+            created_at=item.get("created_at", ""),
+            version=item.get("version", ""),
+            FAIL_TO_PASS=item.get("FAIL_TO_PASS", []),
+            PASS_TO_PASS=item.get("PASS_TO_PASS", []),
+        )
+
+    def _load_local_dataset(
+        self,
+        path: str,
+        *,
+        max_instances: Optional[int] = None,
+    ) -> List[SWEBenchInstance]:
+        file_path = Path(path)
+        if not file_path.exists():
+            raise FileNotFoundError(f"Local dataset not found: {path}")
+
+        with open(file_path, "r", encoding="utf-8") as f:
+            data = json.load(f)
+
+        instances: List[SWEBenchInstance] = []
+        for i, item in enumerate(data):
+            if max_instances and i >= max_instances:
+                break
+            instances.append(self._convert_item_to_instance(item))
+
+        print(f"Loaded {len(instances)} instances from local dataset")
         return instances
     
     def evaluate_instances(self, instances: List[SWEBenchInstance]) -> List[SWEBenchResult]:
@@ -332,11 +541,27 @@ class SWEBenchEvaluator:
             agent_config={
                 "agent_name": "Canister Agent",
                 "model": "gpt-4o",
-                "tools_count": len(self.agent_interface.agent.tools) if hasattr(self.agent_interface.agent, 'tools') else 0
+                "tools_count": self._safe_tools_count()
             }
         )
         
         return report
+
+    def _safe_tools_count(self) -> int:
+        """Return number of tools if available and countable."""
+
+        agent = getattr(self.agent_interface, "agent", None)
+        if agent is None:
+            return 0
+
+        tools = getattr(agent, "tools", None)
+        if tools is None:
+            return 0
+
+        try:
+            return len(tools)
+        except TypeError:
+            return 0
     
     def save_report(self, report: SWEBenchEvaluationReport, output_path: Optional[str] = None):
         """Save evaluation report to file."""

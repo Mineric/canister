@@ -19,6 +19,8 @@ Run a quick test evaluation with 5 instances:
 
 ```bash
 # Run from the project root
+# Optionally point to a local dataset snapshot
+export SWE_BENCH_DATASET_PATH=agent/evals/sample_data/swe_bench_sample.json
 python agent/evals/swe_bench_eval.py
 ```
 
@@ -89,6 +91,7 @@ config = create_evaluation_config(
 - **SWE-bench Verified** (500 instances): Human-verified solvable problems
 - **SWE-bench Full** (2,294 instances): Complete benchmark dataset
 - **SWE-bench Multimodal** (517 instances): Issues with visual elements
+- **Local snapshots**: Point `SWE_BENCH_DATASET_PATH` to a JSON file (see `agent/evals/sample_data/swe_bench_sample.json` for the expected schema) to run offline experiments.
 
 ## Advanced Usage
 
